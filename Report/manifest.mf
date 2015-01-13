@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.unhcr.eg.data.management.tool.report
+OpenIDE-Module-Localizing-Bundle: org/unhcr/eg/data/management/tool/report/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

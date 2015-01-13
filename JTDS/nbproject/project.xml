@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.apisupport.project</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
+            <code-name-base>org.unhcr.eg.registration.tool.jtds</code-name-base>
+            <suite-component/>
+            <module-dependencies/>
+            <public-packages>
+                <package>net.sourceforge.jtds.jdbc</package>
+                <package>net.sourceforge.jtds.jdbc.cache</package>
+                <package>net.sourceforge.jtds.jdbcx</package>
+                <package>net.sourceforge.jtds.jdbcx.proxy</package>
+                <package>net.sourceforge.jtds.ssl</package>
+                <package>net.sourceforge.jtds.util</package>
+            </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/jtds-1.3.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jtds-1.3.1.jar</binary-origin>
+            </class-path-extension>
+        </data>
+    </configuration>
+</project>

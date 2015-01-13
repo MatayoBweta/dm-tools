@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.apisupport.project</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
+            <code-name-base>org.unhcr.eg.registration.tool.commons.jxpath</code-name-base>
+            <suite-component/>
+            <module-dependencies/>
+            <public-packages>
+                <package>org.apache.commons.jxpath</package>
+                <package>org.apache.commons.jxpath.functions</package>
+                <package>org.apache.commons.jxpath.ri</package>
+                <package>org.apache.commons.jxpath.ri.axes</package>
+                <package>org.apache.commons.jxpath.ri.compiler</package>
+                <package>org.apache.commons.jxpath.ri.model</package>
+                <package>org.apache.commons.jxpath.ri.model.beans</package>
+                <package>org.apache.commons.jxpath.ri.model.container</package>
+                <package>org.apache.commons.jxpath.ri.model.dom</package>
+                <package>org.apache.commons.jxpath.ri.model.dynabeans</package>
+                <package>org.apache.commons.jxpath.ri.model.dynamic</package>
+                <package>org.apache.commons.jxpath.ri.model.jdom</package>
+                <package>org.apache.commons.jxpath.ri.parser</package>
+                <package>org.apache.commons.jxpath.servlet</package>
+                <package>org.apache.commons.jxpath.util</package>
+                <package>org.apache.commons.jxpath.xml</package>
+            </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/commons-jxpath-1.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-jxpath-1.3.jar</binary-origin>
+            </class-path-extension>
+        </data>
+    </configuration>
+</project>

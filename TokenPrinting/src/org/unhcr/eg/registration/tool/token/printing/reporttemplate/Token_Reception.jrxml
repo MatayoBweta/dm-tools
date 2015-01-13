@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Token_Reception_add" language="groovy" pageWidth="226" pageHeight="850" columnWidth="198" leftMargin="14" rightMargin="14" topMargin="14" bottomMargin="14" uuid="964bc8bf-9541-4bce-b4c7-40ad36f586b7">
+	<property name="ireport.zoom" value="1.9487171000000014"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="96"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.0" lineColor="#000000"/>
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<subDataset name="issuesWithCase" uuid="ee330d85-75ce-4b3d-8492-08f874f4e0dd">
+		<parameter name="IndividualGUID" class="java.lang.String"/>
+		<parameter name="TokenGUID" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[EXEC [Get_List_Of_Mistakes_New] $P{IndividualGUID}, $P{TokenGUID}]]>
+		</queryString>
+		<field name="IssueGUID" class="java.lang.String"/>
+		<field name="TokenDistributedGUID" class="java.lang.String"/>
+		<field name="MistakeLevel" class="java.lang.String"/>
+		<field name="LocationOfVerification" class="java.lang.String"/>
+		<field name="Scope" class="java.lang.String"/>
+		<field name="MessageError" class="java.lang.String"/>
+		<field name="IndividualID" class="java.lang.String"/>
+		<field name="ConcatenatedName" class="java.lang.String"/>
+		<filterExpression><![CDATA[$F{LocationOfVerification}.contains("1_")]]></filterExpression>
+	</subDataset>
+	<subDataset name="currentAppointments" uuid="4eb3b0bf-5857-452c-96c3-ec654c415118">
+		<parameter name="Case_Number" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT DISTINCT
+                      dbo.vDQNPEvent.EventShortName + ' - ' + dbo.vDQIndividual.IndividualID + ' ' + dbo.vDQIndividual.ConcatenatedName AS WithPendingAppoitment
+FROM         dbo.vDQNPEvent INNER JOIN
+                      dbo.vDQIndividual ON dbo.vDQNPEvent.IndividualGUID = dbo.vDQIndividual.IndividualGUID
+WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'RSD20', N'RSD136', N'RSD39', N'RSD49', N'RSD60', N'RSD75', N'RSD82',
+                      N'RSD104', N'RSD112', N'VOL02')) AND (dbo.vDQNPEvent.EventLogstatus = N'P') AND
+                      (dbo.vDQIndividual.ProcessingGroupNumber = $P{Case_Number})]]>
+		</queryString>
+		<field name="WithPendingAppoitment" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="Case_Number" class="java.lang.String"/>
+	<parameter name="Visit_Reason" class="java.lang.String"/>
+	<parameter name="Gate_Name" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[EXEC Get_Token_Details_New $P{Case_Number}, $P{Visit_Reason}, $P{Gate_Name}]]>
+	</queryString>
+	<field name="TokenDistributedGUID" class="java.lang.String"/>
+	<field name="TokenNumber" class="java.lang.Integer"/>
+	<field name="VisitReason" class="java.lang.String"/>
+	<field name="VisitNumber" class="java.lang.Integer"/>
+	<field name="CaseNumber" class="java.lang.String"/>
+	<field name="IssueToFix" class="java.lang.String"/>
+	<field name="Conditions" class="java.lang.String"/>
+	<field name="FamilySize" class="java.lang.Integer"/>
+	<field name="Location" class="java.lang.String"/>
+	<field name="AccesDateTime" class="java.sql.Timestamp"/>
+	<field name="TokenStatus" class="java.lang.String"/>
+	<field name="GateName" class="java.lang.String"/>
+	<field name="ReasonForVisit" class="java.lang.String"/>
+	<field name="IndividualGUID" class="java.lang.String"/>
+	<variable name="OTHER_VALIDATIONS" class="java.lang.String"/>
+	<background>
+		<band height="312" splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="21">
+			<staticText>
+				<reportElement uuid="61ecf0f8-f252-4eb0-a15a-be8d93f93cb4" x="1" y="0" width="197" height="20"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Admission Token]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="149" splitType="Stretch">
+			<textField>
+				<reportElement uuid="fb70cc6d-a7a1-44d0-bb84-fdf8966895f0" x="0" y="42" width="77" height="35"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Calibri" size="28" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TokenNumber}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="c54cd29c-c7fa-4f01-8344-beafcc5c3536" mode="Transparent" x="78" y="88" width="120" height="26" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="DejaVu Sans" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ReasonForVisit}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c6ef8269-fbf0-4ca4-b841-2b444a0bd1b1" x="78" y="77" width="120" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reason of visit]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="false">
+				<reportElement uuid="ad61f3e6-ea17-4c76-a0e3-5990eab95013" mode="Transparent" x="78" y="66" width="83" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Case_Number}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="4de81127-d0c1-41d6-be60-118fd18a088d" x="78" y="55" width="83" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Case Number]]></text>
+			</staticText>
+			<textField pattern="###0" isBlankWhenNull="false">
+				<reportElement uuid="1c8ae089-9893-475c-9733-2215480ef1ec" mode="Transparent" x="161" y="66" width="37" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FamilySize}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="117c2f91-c87e-45f4-a25a-8ec1c5466d24" x="161" y="55" width="37" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Family SIze]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4923aef8-3ce1-41f9-953d-4e79eff3ee2c" x="1" y="114" width="197" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Issues to fix with the Case]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="94284d60-f036-47e6-8668-9915448cf3bd" x="14" y="31" width="55" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Token Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="246c1945-e293-4b1a-b9ca-5db32a7a4215" x="77" y="24" width="120" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Admission Date and TIme]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement uuid="c2245df7-db1b-488d-bcea-9770a075d9bf" key="table" style="table" x="1" y="125" width="197" height="23"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="issuesWithCase" uuid="c545ec01-87c8-4597-b517-3a4a5f9d2e6c">
+						<datasetParameter name="IndividualGUID">
+							<datasetParameterExpression><![CDATA[$F{IndividualGUID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<datasetParameter name="TokenGUID">
+							<datasetParameterExpression><![CDATA[$F{TokenDistributedGUID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="18" uuid="81787f7f-d447-48ce-bdf2-9f2b8296bf26">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement uuid="0746b062-61a7-4d12-95a1-b928220c7f23" x="0" y="0" width="18" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT} + "."]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="174" uuid="b2a90b33-9057-45da-bb8a-cdc7c061eb36">
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="815abd48-687a-42dd-935b-32823c1921c9" x="0" y="0" width="174" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{MessageError} + " " +$F{IndividualID} + "-" +$F{ConcatenatedName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField pattern="EEE, d MMM yyyy HH:mm:ss Z">
+				<reportElement uuid="6c7a1979-a9c0-499a-a9e6-5db4af4d5ce1" x="78" y="35" width="120" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Calibri" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AccesDateTime}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="54fa1bfe-7bf2-4fae-a982-bb85425c5a7c" mode="Transparent" x="0" y="0" width="77" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="b100ff6c-9a61-4c95-a0e1-b55016ed028e" mode="Transparent" x="78" y="0" width="120" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Location}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="95455cf1-6eb0-42c1-8362-377f976848c9" x="0" y="88" width="78" height="26"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VisitNumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="061fbff0-12eb-48b4-a56f-4402a046e677" mode="Transparent" x="14" y="77" width="55" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Sub Token]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="89ffb578-3787-48e6-bfc3-1dbee3608dc8" mode="Transparent" x="0" y="11" width="77" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Gate Name]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="4967b70d-d5b1-4652-bb07-9ae858bf0da4" mode="Transparent" x="78" y="11" width="120" height="11" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GateName}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="35">
+			<staticText>
+				<reportElement uuid="6f08b984-a92d-4125-a50b-5e2ee28fafd4" x="1" y="0" width="197" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pending Appoitments]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement uuid="245ac353-db7e-4204-92c6-588a650ae00c" key="table" style="table" x="0" y="11" width="197" height="23"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="currentAppointments" uuid="e75e49a5-cec4-4b57-af35-03141fe0ebc3">
+						<datasetParameter name="Case_Number">
+							<datasetParameterExpression><![CDATA[$P{Case_Number}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="18" uuid="8ec8a46d-4305-428f-a29b-5b7a0cd42948">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement uuid="e522c669-2f8c-4d7a-887e-016a2f837c8a" x="0" y="0" width="18" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT} + "."]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="174" uuid="58a7a05d-54e5-42fb-9733-7789fd94e8d8">
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="646e42e5-8ccd-4ef0-a3f0-5ecc7e2d2470" x="0" y="0" width="174" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{WithPendingAppoitment}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="134">
+			<staticText>
+				<reportElement uuid="f22ee63d-0da2-4e14-a359-22ee1757d4cd" x="1" y="0" width="197" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Referral Mechanism]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="8d43f517-5df3-4d27-b974-059ef05645ac" mode="Transparent" x="0" y="11" width="196" height="123" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="Calibri" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Conditions}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

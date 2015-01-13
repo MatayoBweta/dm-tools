@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.unhcr.eg.registration.tool.proGres.entities
+OpenIDE-Module-Localizing-Bundle: org/unhcr/eg/registration/tool/proGres/entities/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

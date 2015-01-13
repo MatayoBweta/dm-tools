@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.unhcr.eg.registration.security
+OpenIDE-Module-Install: org/unhcr/eg/registration/security/Installer.class
+OpenIDE-Module-Localizing-Bundle: org/unhcr/eg/registration/security/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

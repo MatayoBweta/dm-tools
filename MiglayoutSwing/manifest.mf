@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.unhcr.eg.registration.tool.miglayout
+OpenIDE-Module-Localizing-Bundle: org/unhcr/eg/registration/tool/miglayout/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
