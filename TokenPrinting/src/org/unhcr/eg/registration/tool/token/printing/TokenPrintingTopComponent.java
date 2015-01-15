@@ -116,7 +116,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         jPanel11 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jPanel12 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         caseNumberTextField = new javax.swing.JTextField();
@@ -173,7 +172,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
         jPanel3.setLayout(new java.awt.BorderLayout());
-        jPanel3.add(jPanel12, java.awt.BorderLayout.PAGE_START);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -570,7 +568,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportViewLocation);
         manager = new PrinterManager(is, new HashMap<>());
         manager.setParameter("TokenDistributedGUID", tokenGUID);
-        manager.previewPrinter("Preview the Token for Case " + caseNumber, "Token");
+        manager.previewPrinter("Preview the Token for Case " + caseNumber, "Token " + tokenGUID + " for Case " + caseNumber);
     }
 
     private void printTokenButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printTokenButton1ActionPerformed
@@ -712,9 +710,12 @@ public final class TokenPrintingTopComponent extends TopComponent {
             @Override
             protected void mainAction() {
                 int selectedRow = tokenTable.getSelectedRow();
-                final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 6);
-                final String tokenGUID = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 1);
-                effectivePreviewToken(tokenGUID,caseNumber);
+                System.out.println("tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5) " + tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5));
+                System.out.println("tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0) " + tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0));
+
+                final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5);
+                final String tokenGUID = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0);
+                effectivePreviewToken(tokenGUID, caseNumber);
             }
 
         };
@@ -741,7 +742,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
