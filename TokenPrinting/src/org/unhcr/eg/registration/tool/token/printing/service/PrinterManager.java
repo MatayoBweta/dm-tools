@@ -120,6 +120,7 @@ public class PrinterManager {
         if (selectedService != null) {
             try {
                 printerJob.setPrintService(selectedService);
+                
                 boolean printSucceed = JasperPrintManager.printReport(jasperPrint, false);
                 if (printSucceed) {
                     System.out.println("Successfullly Printed");

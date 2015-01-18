@@ -71,14 +71,11 @@ public class JDBCTableModel extends AbstractTableModel {
                 if (columnClasses[i] == String.class) {
                     cellValue = results.getString(columnNames[i]);
                 } else if (columnClasses[i] == Integer.class) {
-                    cellValue = new Integer(
-                            results.getInt(columnNames[i]));
+                    cellValue = results.getInt(columnNames[i]);
                 } else if (columnClasses[i] == Float.class) {
-                    cellValue = new Float(
-                            results.getInt(columnNames[i]));
+                    cellValue = results.getFloat(columnNames[i]);
                 } else if (columnClasses[i] == Double.class) {
-                    cellValue = new Double(
-                            results.getDouble(columnNames[i]));
+                    cellValue = results.getDouble(columnNames[i]);
                 } else if (columnClasses[i] == java.sql.Date.class) {
                     cellValue = results.getDate(columnNames[i]);
                 } else {
@@ -277,15 +274,12 @@ public class JDBCTableModel extends AbstractTableModel {
             String query)
             throws SQLException {
         try (Statement statement = conn.createStatement()) {
-            statement.setMaxRows(1);
-            System.out.println("query " + query);
+            statement.setMaxRows(1); 
             ResultSet results = statement.executeQuery(query);
             ResultSetMetaData metaData = results.getMetaData();
-            System.out.println("got column results");
             ArrayList colNamesList = new ArrayList();
             ArrayList colClassesList = new ArrayList();
             int nbreOfColumn = metaData.getColumnCount();
-            System.out.println("nbreOfColumn " + nbreOfColumn);
             for (int i = 1; i <= nbreOfColumn; i++) {
                 colNamesList.add(metaData.getColumnName(i));
                 int dbType = metaData.getColumnType(i);
@@ -328,14 +322,11 @@ public class JDBCTableModel extends AbstractTableModel {
                     if (columnClasses[i] == String.class) {
                         cellValue = results.getString(columnNames[i]);
                     } else if (columnClasses[i] == Integer.class) {
-                        cellValue = new Integer(
-                                results.getInt(columnNames[i]));
+                        cellValue = results.getInt(columnNames[i]);
                     } else if (columnClasses[i] == Float.class) {
-                        cellValue = new Float(
-                                results.getInt(columnNames[i]));
+                        cellValue = (float) results.getInt(columnNames[i]);
                     } else if (columnClasses[i] == Double.class) {
-                        cellValue = new Double(
-                                results.getDouble(columnNames[i]));
+                        cellValue = results.getDouble(columnNames[i]);
                     } else if (columnClasses[i] == java.sql.Date.class) {
                         cellValue = results.getDate(columnNames[i]);
                     } else {

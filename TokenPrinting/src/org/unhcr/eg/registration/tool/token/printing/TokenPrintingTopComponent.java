@@ -11,7 +11,6 @@ import java.awt.HeadlessException;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +21,7 @@ import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.painter.GlossPainter;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.*;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.Exceptions;
@@ -547,13 +547,33 @@ public final class TokenPrintingTopComponent extends TopComponent {
 
     protected void effectivePrintToken(final String caseNumber, final String reason, String gate) throws HeadlessException {
 
-        if (VisitCategoryController.checkCaseNumber(caseNumber) || caseNumber.equals("NR")) {
+        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
             try {
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportLocation);
-                manager = new PrinterManager(is, new HashMap<String, Object>());
+                manager = new PrinterManager(is, new HashMap<>());
                 manager.setParameter("Case_Number", caseNumber);
                 manager.setParameter("Visit_Reason", reason);
                 manager.setParameter("Gate_Name", gate);
+                manager.setParameter("New_Individuals", 0);
+                manager.print();
+            } catch (JRException | FileNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(caseNumberTextField, "Case Number not present in proGres\nPlease check again", "Wrong Case Number", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    protected void effectivePrintToken(final String caseNumber, final String reason, String gate, int numberOfIndividuals) throws HeadlessException {
+
+        if (caseNumber.equals("NR")) {
+            try {
+                InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportLocation);
+                manager = new PrinterManager(is, new HashMap<>());
+                manager.setParameter("Case_Number", caseNumber);
+                manager.setParameter("Visit_Reason", reason);
+                manager.setParameter("Gate_Name", gate);
+                manager.setParameter("New_Individuals", numberOfIndividuals);
                 manager.print();
             } catch (JRException | FileNotFoundException ex) {
                 Exceptions.printStackTrace(ex);
@@ -572,7 +592,19 @@ public final class TokenPrintingTopComponent extends TopComponent {
     }
 
     private void printTokenButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printTokenButton1ActionPerformed
+        String txt = "Number Of Individuals: ";
+        String title = "New Registration";
 
+        NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(txt, title);
+        input.setInputText("1"); // specify a default name
+        Object result = DialogDisplayer.getDefault().notify(input);
+        if (result != NotifyDescriptor.OK_OPTION) {
+            return;
+        }
+        String userInput = input.getInputText();
+        if (!userInput.matches("\\d+")) {
+            return;
+        }
         LongTaskBackgroundAction action;
         caseNumberTextField.setEnabled(false);
         final Gate gate = (Gate) gateComboBox.getSelectedItem();
@@ -582,7 +614,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
             protected void mainAction() {
                 int option = JOptionPane.showConfirmDialog(printTokenButton, "Do you want to print Token for new family?", "New Registration", JOptionPane.YES_NO_OPTION);
                 if (option == JOptionPane.OK_OPTION) {
-                    effectivePrintToken("NR", "VIS0001", gate.getGateName());
+                    effectivePrintToken("NR", "VIS0001", gate.getGateName(), Integer.getInteger(userInput));
                 }
                 caseNumberTextField.setEnabled(true);
             }
