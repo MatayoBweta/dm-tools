@@ -128,4 +128,22 @@ public class ClockManager {
         return date;
     }
 
+    public static Date getDateAndHourOnly(Date date) {
+        if (date == null) {
+            return null;
+        }
+// Get Calendar object set to the date and time of the given Date object
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+// Set time fields to zero
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+// Put it back in the Date object
+        date = cal.getTime();
+        return date;
+    }
+
 }

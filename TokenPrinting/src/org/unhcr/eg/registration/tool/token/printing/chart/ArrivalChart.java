@@ -69,26 +69,31 @@ public class ArrivalChart {
     protected void geNextData(Date startingDate, Date endDate) throws SQLException {
         clearData();
         TreeMap<java.sql.Date, AccessTimeReport> caseAccessTimeReport = TokenManagerService.getCaseAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
-        for (Map.Entry<java.sql.Date, AccessTimeReport> entrySet : caseAccessTimeReport.entrySet()) {
-            java.sql.Date key = entrySet.getKey();
-            String label = getDateLabel(ClockManager.getUtilDate(key));
-            AccessTimeReport value = entrySet.getValue();
-            caseDataSeries.getData().add(new XYChart.Data<>(label, value.getNumber()));
-        }
-        TreeMap<java.sql.Date, AccessTimeReport> individualAccessTimeReport = TokenManagerService.getIndividualAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
-        for (Map.Entry<java.sql.Date, AccessTimeReport> entrySet : individualAccessTimeReport.entrySet()) {
-            java.sql.Date key = entrySet.getKey();
-            String label = getDateLabel(ClockManager.getUtilDate(key));
-            AccessTimeReport value = entrySet.getValue();
-            individualDataSeries.getData().add(new XYChart.Data<>(label, value.getNumber()));
-        }
+        parseData(caseAccessTimeReport, caseDataSeries);
 
+        TreeMap<java.sql.Date, AccessTimeReport> individualAccessTimeReport = TokenManagerService.getIndividualAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
+        parseData(individualAccessTimeReport, individualDataSeries);
+
+    }
+
+    protected void parseData(TreeMap<java.sql.Date, AccessTimeReport> caseAccessTimeReport, XYChart.Series<String, Number> dataSeries) {
+        TreeMap<Date, Integer> values = new TreeMap<>();
+        caseAccessTimeReport.entrySet().stream().forEach((entrySet) -> {
+            java.sql.Date key = entrySet.getKey();
+            Date label = ClockManager.getDateAndHourOnly(ClockManager.getUtilDate(key));
+            AccessTimeReport value = entrySet.getValue();
+            values.put(label, value.getCumulativeNumber());
+        });
+        values.entrySet().stream().forEach((entrySet) -> {
+            Date key = entrySet.getKey();
+            Integer value = entrySet.getValue();
+            dataSeries.getData().add(new XYChart.Data<>(getDateLabel(key), value));
+        });
     }
 
     protected void clearData() {
         caseDataSeries.getData().clear();
         individualDataSeries.getData().clear();
-
     }
 
     protected void geNextData() {
@@ -97,8 +102,8 @@ public class ArrivalChart {
     }
 
     protected String getDateLabel(Date date) {
-        DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH");
-        return df.format(date) + "H";
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        return df.format(date);
     }
 
     protected void plotTime(Date startingDate, Date endDate) throws SQLException {
@@ -106,12 +111,11 @@ public class ArrivalChart {
         this.startingDate = TokenManagerService.getMinReceptionDate(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
         this.startingDateLabel = getDateLabel(this.startingDate);
         this.endDateLabel = getDateLabel(this.endDate);
-
     }
 
     protected LineChart<String, Number> createChart() {
         xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis(0, 100, 10);
+        final NumberAxis yAxis = new NumberAxis(0, 1000, 10);
         final LineChart<String, Number> lc = new LineChart<>(xAxis, yAxis);
         // setup chart
         lc.setId("lineStockDemo");
@@ -120,6 +124,7 @@ public class ArrivalChart {
         lc.setLegendVisible(false);
         lc.setTitle("Arrival Chart Per hour");
         xAxis.setLabel("Time");
+
         yAxis.setLabel("Number of Individual");
         yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis, "", null));
         // add starting data
@@ -137,17 +142,14 @@ public class ArrivalChart {
         animation.play();
     }
 
-    
     public void stop() {
         animation.pause();
     }
 
-    
     public void start(Stage primaryStage) throws Exception {
         init(primaryStage);
         primaryStage.show();
         play();
     }
 
-   
 }
