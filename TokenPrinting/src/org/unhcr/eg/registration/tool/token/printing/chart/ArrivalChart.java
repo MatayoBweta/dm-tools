@@ -102,16 +102,25 @@ public class ArrivalChart {
         individualDataSeries.getData().clear();
     }
 
+    public Date getStartingDate() {
+        return startingDate;
+    }
+
+    public void setStartingDate(Date startingDate) throws SQLException {
+        this.startingDate = TokenManagerService.getMinReceptionDate(ClockManager.getSQLDate(startingDate));
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) throws SQLException {
+        this.endDate = TokenManagerService.getMinReceptionDate(ClockManager.getSQLDate(endDate));
+    }
+
     protected String getDateLabel(Date date) {
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         return df.format(date);
-    }
-
-    protected void plotTime(Date startingDate, Date endDate) throws SQLException {
-        this.endDate = TokenManagerService.getMaxReceptionDate(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
-        this.startingDate = TokenManagerService.getMinReceptionDate(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
-        this.startingDateLabel = getDateLabel(this.startingDate);
-        this.endDateLabel = getDateLabel(this.endDate);
     }
 
     protected LineChart<String, Number> createChart() {
