@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.chart.CategoryAxis;
@@ -24,6 +25,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.util.Duration;
+import org.openide.util.Exceptions;
 import org.unhcr.eg.registration.security.date.ClockManager;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenManagerService;
@@ -47,7 +49,7 @@ public class ArrivalChart {
     private String startingDateLabel;
     private String endDateLabel;
 
-    private void init(Stage primaryStage) throws SQLException {
+    private void init(JFXPanel primaryStage) throws SQLException {
 
         endDate = TokenManagerService.getMaxReceptionDate();
         startingDate = TokenManagerService.getMinReceptionDate();
@@ -59,14 +61,18 @@ public class ArrivalChart {
         animation.getKeyFrames().add(new KeyFrame(Duration.millis(1000 / 60), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                geNextData();
+                try {
+                    geNextData();
+                } catch (SQLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
 
         }));
         animation.setCycleCount(Animation.INDEFINITE);
     }
 
-    protected void geNextData(Date startingDate, Date endDate) throws SQLException {
+    protected void geNextData() throws SQLException {
         clearData();
         TreeMap<java.sql.Date, AccessTimeReport> caseAccessTimeReport = TokenManagerService.getCaseAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
         parseData(caseAccessTimeReport, caseDataSeries);
@@ -94,11 +100,6 @@ public class ArrivalChart {
     protected void clearData() {
         caseDataSeries.getData().clear();
         individualDataSeries.getData().clear();
-    }
-
-    protected void geNextData() {
-        clearData();
-
     }
 
     protected String getDateLabel(Date date) {
@@ -146,9 +147,8 @@ public class ArrivalChart {
         animation.pause();
     }
 
-    public void start(Stage primaryStage) throws Exception {
-        init(primaryStage);
-        primaryStage.show();
+    public void start(JFXPanel panel) throws Exception {
+        init(panel);
         play();
     }
 
