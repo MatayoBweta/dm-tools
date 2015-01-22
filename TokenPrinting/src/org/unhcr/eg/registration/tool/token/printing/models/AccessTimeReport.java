@@ -13,22 +13,28 @@ import java.util.Date;
  */
 public class AccessTimeReport {
 
-    private Date acceTime;
+    private Date accessTime;
+    private String gate;
+    private String typeOfNumber;
     private int number;
     private int cumulativeNumber;
 
-    public AccessTimeReport(Date acceTime, int number, int cumulativeNumber) {
-        this.acceTime = acceTime;
+    public AccessTimeReport(Date accessTime, String gate, String typeOfNumber, int number, int cumulativeNumber) {
+        this.accessTime = accessTime;
+        this.gate = gate;
+        this.typeOfNumber = typeOfNumber;
         this.number = number;
         this.cumulativeNumber = cumulativeNumber;
     }
 
-    public Date getAcceTime() {
-        return acceTime;
+   
+
+    public Date getAccessTime() {
+        return accessTime;
     }
 
-    public void setAcceTime(Date acceTime) {
-        this.acceTime = acceTime;
+    public void setAccessTime(Date accessTime) {
+        this.accessTime = accessTime;
     }
 
     public int getNumber() {
@@ -45,6 +51,22 @@ public class AccessTimeReport {
 
     public void setCumulativeNumber(int cumulativeNumber) {
         this.cumulativeNumber = cumulativeNumber;
+    }
+
+    public String getGate() {
+        return gate;
+    }
+
+    public void setGate(String gate) {
+        this.gate = gate;
+    }
+
+    public String getTypeOfNumber() {
+        return typeOfNumber;
+    }
+
+    public void setTypeOfNumber(String typeOfNumber) {
+        this.typeOfNumber = typeOfNumber;
     }
 
 }

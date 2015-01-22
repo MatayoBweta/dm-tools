@@ -6,6 +6,7 @@
 package org.unhcr.eg.registration.tool.token.printing;
 
 import com.ezware.oxbow.swingbits.table.filter.TableRowFilterSupport;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.HeadlessException;
 import java.io.FileNotFoundException;
@@ -14,6 +15,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javafx.application.Platform;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
 import net.sf.jasperreports.engine.JRException;
@@ -30,10 +32,10 @@ import org.openide.util.NbBundle.Messages;
 import org.unhcr.eg.registration.security.action.LongTaskBackgroundAction;
 import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
 import org.unhcr.eg.registration.security.exchange.ExcelSaver;
+import org.unhcr.eg.registration.tool.token.printing.chart.ArrivalChart;
 import org.unhcr.eg.registration.tool.token.printing.models.Gate;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitCategory;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitReason;
-import org.unhcr.eg.registration.tool.token.printing.panel.PanelReport;
 import org.unhcr.eg.registration.tool.token.printing.service.PrinterManager;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenSummaryTableModel;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenTableModel;
@@ -68,15 +70,23 @@ public final class TokenPrintingTopComponent extends TopComponent {
     protected PrinterManager manager;
     protected final String reportLocation = "org/unhcr/eg/registration/tool/token/printing/reporttemplate/Token_Reception.jasper";
     protected final String reportViewLocation = "org/unhcr/eg/registration/tool/token/printing/reporttemplate/Token_Reception_view.jasper";
-    private String previousCaseNumber;
-    private boolean fromNewRegistration;
     private final TokenTableModel tokenTableModel;
     private final TokenSummaryTableModel tokenSummaryTableModel;
-    private PanelReport dailyTokenNumber;
-    private PanelReport dailyPotentialIndividualReceived;
+    private ArrivalChart arrivalChart;
 
     public TokenPrintingTopComponent() {
         initComponents();
+
+        Platform.runLater(() -> {
+            try {
+                arrivalChart = new ArrivalChart();
+                reportPanel.add(arrivalChart, BorderLayout.CENTER);
+                arrivalChart.getFreshData();
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        });
+
         setName(Bundle.CTL_TokenPrintingTopComponent());
         setToolTipText(Bundle.HINT_TokenPrintingTopComponent());
         tokenTableModel = new TokenTableModel();
@@ -111,6 +121,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
         visitReasons = ObservableCollections.observableList(new ArrayList());
         gates = ObservableCollections.observableList(VisitCategoryController.getGateList())
         ;
+        categoryButtonGroup = new javax.swing.ButtonGroup();
         mainHeader = new org.jdesktop.swingx.JXHeader();
         jPanel9 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
@@ -127,6 +138,11 @@ public final class TokenPrintingTopComponent extends TopComponent {
         printTokenButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         gateComboBox = new javax.swing.JComboBox();
+        reportPanel = new javax.swing.JPanel();
+        jToolBar3 = new javax.swing.JToolBar();
+        reloadChartButton = new javax.swing.JButton();
+        dailyToggleButton = new javax.swing.JToggleButton();
+        cumulativeToggleButton = new javax.swing.JToggleButton();
         jPanel10 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
@@ -169,22 +185,22 @@ public final class TokenPrintingTopComponent extends TopComponent {
         jPanel9.add(jPanel11, java.awt.BorderLayout.PAGE_START);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setLayout(new java.awt.GridBagLayout());
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel1.text")); // NOI18N
 
-        caseNumberTextField.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        caseNumberTextField.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         caseNumberTextField.setText(org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.caseNumberTextField.text")); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel2.text")); // NOI18N
 
-        categoryComboBox.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        categoryComboBox.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
 
         org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, visitCategories, categoryComboBox);
         bindingGroup.addBinding(jComboBoxBinding);
@@ -195,15 +211,15 @@ public final class TokenPrintingTopComponent extends TopComponent {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel3.text")); // NOI18N
 
-        reasonComboBox.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        reasonComboBox.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
 
         jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, visitReasons, reasonComboBox);
         bindingGroup.addBinding(jComboBoxBinding);
 
-        printTokenButton.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        printTokenButton.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         printTokenButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/printer-16.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(printTokenButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.printTokenButton.text")); // NOI18N
         printTokenButton.addActionListener(new java.awt.event.ActionListener() {
@@ -212,7 +228,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
             }
         });
 
-        printTokenButton1.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        printTokenButton1.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         printTokenButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/printer-16.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(printTokenButton1, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.printTokenButton1.text")); // NOI18N
         printTokenButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -221,10 +237,10 @@ public final class TokenPrintingTopComponent extends TopComponent {
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel5.text")); // NOI18N
 
-        gateComboBox.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        gateComboBox.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
 
         jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, gates, gateComboBox);
         bindingGroup.addBinding(jComboBoxBinding);
@@ -235,55 +251,96 @@ public final class TokenPrintingTopComponent extends TopComponent {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(printTokenButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                    .addComponent(gateComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel5)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(gateComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(reasonComboBox, 0, 282, Short.MAX_VALUE)
-                            .addComponent(categoryComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(caseNumberTextField)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 99, Short.MAX_VALUE)
-                        .addComponent(printTokenButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(printTokenButton)))
-                .addContainerGap())
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel1)
+                            .addComponent(caseNumberTextField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2)
+                            .addComponent(categoryComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(reasonComboBox, 0, 246, Short.MAX_VALUE)))
+                    .addComponent(printTokenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(caseNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(categoryComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(reasonComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(gateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(printTokenButton1)
-                    .addComponent(printTokenButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(12, 12, 12)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(caseNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addGap(4, 4, 4)
+                .addComponent(categoryComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reasonComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(gateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(printTokenButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(printTokenButton)
+                .addContainerGap())
         );
 
-        jPanel3.add(jPanel1, java.awt.BorderLayout.CENTER);
+        jPanel3.add(jPanel1, java.awt.BorderLayout.WEST);
 
-        jPanel2.add(jPanel3, new java.awt.GridBagConstraints());
+        reportPanel.setLayout(new java.awt.BorderLayout());
+
+        jToolBar3.setRollover(true);
+
+        reloadChartButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/1421940027_reload_all_tabs.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(reloadChartButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.reloadChartButton.text")); // NOI18N
+        reloadChartButton.setFocusable(false);
+        reloadChartButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        reloadChartButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        reloadChartButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reloadChartButtonActionPerformed(evt);
+            }
+        });
+        jToolBar3.add(reloadChartButton);
+
+        categoryButtonGroup.add(dailyToggleButton);
+        dailyToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/1421940493_Calendar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(dailyToggleButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.dailyToggleButton.text")); // NOI18N
+        dailyToggleButton.setFocusable(false);
+        dailyToggleButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        dailyToggleButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        dailyToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dailyToggleButtonActionPerformed(evt);
+            }
+        });
+        jToolBar3.add(dailyToggleButton);
+
+        categoryButtonGroup.add(cumulativeToggleButton);
+        cumulativeToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/1421940545_piechart.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(cumulativeToggleButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.cumulativeToggleButton.text")); // NOI18N
+        cumulativeToggleButton.setFocusable(false);
+        cumulativeToggleButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cumulativeToggleButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        cumulativeToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cumulativeToggleButtonActionPerformed(evt);
+            }
+        });
+        jToolBar3.add(cumulativeToggleButton);
+
+        reportPanel.add(jToolBar3, java.awt.BorderLayout.NORTH);
+
+        jPanel3.add(reportPanel, java.awt.BorderLayout.CENTER);
+
+        jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
 
         jPanel9.add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -392,9 +449,11 @@ public final class TokenPrintingTopComponent extends TopComponent {
         });
         jToolBar1.add(printAgainButton);
 
+        previewButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/1421961775_Preview.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(previewButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.previewButton.text")); // NOI18N
         previewButton.setFocusable(false);
-        previewButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        previewButton.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        previewButton.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         previewButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, tokenTable, org.jdesktop.beansbinding.ELProperty.create("${selectedElement != null}"), previewButton, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
@@ -754,12 +813,36 @@ public final class TokenPrintingTopComponent extends TopComponent {
         action.actionPerformed(evt);
     }//GEN-LAST:event_previewButtonActionPerformed
 
+    private void reloadChartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadChartButtonActionPerformed
+        try {
+            arrivalChart.getFreshData();
+            categoryButtonGroup.clearSelection();
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_reloadChartButtonActionPerformed
+
+    private void dailyToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dailyToggleButtonActionPerformed
+        System.out.println("dailyToggleButtonActionPerformed ");
+        arrivalChart.getOfflineData(0);
+
+    }//GEN-LAST:event_dailyToggleButtonActionPerformed
+
+    private void cumulativeToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cumulativeToggleButtonActionPerformed
+        System.out.println("cumulativeToggleButtonActionPerformed ");
+        arrivalChart.getOfflineData(1);
+
+    }//GEN-LAST:event_cumulativeToggleButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JTextField caseNumberTextField;
+    private javax.swing.ButtonGroup categoryButtonGroup;
     private javax.swing.JComboBox categoryComboBox;
     private org.jdesktop.swingx.JXHeader child2Header;
     private org.jdesktop.swingx.JXHeader childHeader;
+    private javax.swing.JToggleButton cumulativeToggleButton;
+    private javax.swing.JToggleButton dailyToggleButton;
     private javax.swing.JButton exportToExcelButton;
     private javax.swing.JComboBox gateComboBox;
     private java.util.List<org.unhcr.eg.registration.tool.token.printing.models.Gate> gates;
@@ -788,6 +871,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
+    private javax.swing.JToolBar jToolBar3;
     private javax.swing.JButton loadButton;
     private org.jdesktop.swingx.JXHeader mainHeader;
     private javax.swing.JButton previewButton;
@@ -795,6 +879,8 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private javax.swing.JButton printTokenButton;
     private javax.swing.JButton printTokenButton1;
     private javax.swing.JComboBox reasonComboBox;
+    private javax.swing.JButton reloadChartButton;
+    private javax.swing.JPanel reportPanel;
     private org.jdesktop.swingx.JXTable summaryXTable;
     private javax.swing.JButton todayButton;
     private org.jdesktop.swingx.JXTable tokenTable;

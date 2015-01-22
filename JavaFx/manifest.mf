@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.unhcr.eg.registration.tool.javafx
-OpenIDE-Module-Localizing-Bundle: org/unhcr/eg/registration/tool/javafx/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-

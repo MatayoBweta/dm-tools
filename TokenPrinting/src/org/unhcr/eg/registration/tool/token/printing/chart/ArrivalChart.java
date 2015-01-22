@@ -5,30 +5,26 @@
  */
 package org.unhcr.eg.registration.tool.token.printing.chart;
 
+import com.google.gson.Gson;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.TreeMap;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.util.Duration;
-import org.openide.util.Exceptions;
+import javafx.scene.web.WebView;
+
 import org.unhcr.eg.registration.security.date.ClockManager;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenManagerService;
+import org.w3c.dom.Document;
 
 /**
  * A simulated stock line chart.
@@ -38,68 +34,104 @@ import org.unhcr.eg.registration.tool.token.printing.service.TokenManagerService
  * @see javafx.scene.chart.NumberAxis
  * @see javafx.scene.chart.XYChart
  */
-public class ArrivalChart {
+public class ArrivalChart extends JFXPanel {
 
-    private XYChart.Series<String, Number> caseDataSeries;
-    private XYChart.Series<String, Number> individualDataSeries;
-    private CategoryAxis xAxis;
     private Timeline animation;
     private Date startingDate;
     private Date endDate;
-    private String startingDateLabel;
-    private String endDateLabel;
+    private Date lastLoadingDate = new Date(0);
+    private WebView webview;
+    private TreeMap<java.sql.Timestamp, List<AccessTimeReport>> accessTimeReports;
+    private boolean ready;
 
-    private void init(JFXPanel primaryStage) throws SQLException {
-
-        endDate = TokenManagerService.getMaxReceptionDate();
+    public ArrivalChart() throws Exception {
         startingDate = TokenManagerService.getMinReceptionDate();
-        Group root = new Group();
-        primaryStage.setScene(new Scene(root));
-        root.getChildren().add(createChart());
-        // create timeline to add new data every 60th of second
-        animation = new Timeline();
-        animation.getKeyFrames().add(new KeyFrame(Duration.millis(1000 / 60), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                try {
-                    geNextData();
-                } catch (SQLException ex) {
-                    Exceptions.printStackTrace(ex);
+        endDate = TokenManagerService.getMaxReceptionDate();
+        webview = new WebView();
+        webview.setContextMenuEnabled(false);
+        webview.getEngine().load(
+                ArrivalChart.class.getResource("/org/unhcr/eg/registration/tool/token/printing/chart/ArrivalChart.html").toExternalForm()
+        );
+        setScene(new Scene(webview));
+
+    }
+
+    public void getFreshData() throws SQLException {
+        accessTimeReports = TokenManagerService.getAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate), ClockManager.getSQLDate(lastLoadingDate));
+        getOfflineData(0);
+    }
+
+    public void getOfflineData(int i) {
+        if (!ready) {
+            webview.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
+                @Override
+                public void changed(ObservableValue<? extends Document> observableValue, Document document, Document newDoc) {
+                    if (newDoc != null) {
+                        webview.getEngine().documentProperty().removeListener(this);
+                        ready = true;
+                        pushData(i);
+                    }
+                }
+            });
+        } else {
+            pushData(i);
+        }
+    }
+
+    protected void pushData(int i) {
+        Platform.runLater(() -> {
+            webview.getEngine().executeScript("removeData()");
+            parseData(accessTimeReports, i);
+        });
+
+    }
+
+    protected void parseData(TreeMap<java.sql.Timestamp, List<AccessTimeReport>> caseAccessTimeReport, int i) {
+        List<ChartPoint> individuals = new ArrayList<>();
+        List<ChartPoint> cases = new ArrayList<>();
+        List<ChartPoint> cumulateIndividuals = new ArrayList<>();
+        List<ChartPoint> cumulateCases = new ArrayList<>();
+
+        caseAccessTimeReport.entrySet().stream().forEach((entrySet) -> {
+            java.sql.Timestamp key = entrySet.getKey();
+            Date label = new Date(key.getTime());
+            List<AccessTimeReport> values = entrySet.getValue();
+
+            for (AccessTimeReport value : values) {
+                switch (value.getTypeOfNumber()) {
+                    case "I":
+                        individuals.add(new ChartPoint(label.getTime(), value.getCumulativeNumber()));
+                        break;
+                    case "C":
+                        cases.add(new ChartPoint(label.getTime(), value.getCumulativeNumber()));
+                        break;
+                    case "AI":
+                        cumulateIndividuals.add(new ChartPoint(label.getTime(), value.getCumulativeNumber()));
+                        break;
+                    case "CI":
+                        cumulateCases.add(new ChartPoint(label.getTime(), value.getCumulativeNumber()));
+                        break;
                 }
             }
-
-        }));
-        animation.setCycleCount(Animation.INDEFINITE);
-    }
-
-    protected void geNextData() throws SQLException {
-        clearData();
-        TreeMap<java.sql.Date, AccessTimeReport> caseAccessTimeReport = TokenManagerService.getCaseAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
-        parseData(caseAccessTimeReport, caseDataSeries);
-
-        TreeMap<java.sql.Date, AccessTimeReport> individualAccessTimeReport = TokenManagerService.getIndividualAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
-        parseData(individualAccessTimeReport, individualDataSeries);
-
-    }
-
-    protected void parseData(TreeMap<java.sql.Date, AccessTimeReport> caseAccessTimeReport, XYChart.Series<String, Number> dataSeries) {
-        TreeMap<Date, Integer> values = new TreeMap<>();
-        caseAccessTimeReport.entrySet().stream().forEach((entrySet) -> {
-            java.sql.Date key = entrySet.getKey();
-            Date label = ClockManager.getDateAndHourOnly(ClockManager.getUtilDate(key));
-            AccessTimeReport value = entrySet.getValue();
-            values.put(label, value.getCumulativeNumber());
         });
-        values.entrySet().stream().forEach((entrySet) -> {
-            Date key = entrySet.getKey();
-            Integer value = entrySet.getValue();
-            dataSeries.getData().add(new XYChart.Data<>(getDateLabel(key), value));
-        });
+        Gson gson = new Gson();
+        if (i == 0) {
+            System.out.println("addIndividuals addCases");
+            webview.getEngine().executeScript("addIndividuals(" + gson.toJson(individuals) + ")");
+            webview.getEngine().executeScript("addCases(" + gson.toJson(cases) + ")");
+        } else if (i == 1) {
+            System.out.println("addCumulateIndividuals addCumulateCases");
+            webview.getEngine().executeScript("addCumulateIndividuals(" + gson.toJson(cumulateIndividuals) + ")");
+            webview.getEngine().executeScript("addCumulateCases(" + gson.toJson(cumulateCases) + ")");
+
+        }
     }
 
-    protected void clearData() {
-        caseDataSeries.getData().clear();
-        individualDataSeries.getData().clear();
+    protected void changeLastLoadingDate(Date label) {
+        if (lastLoadingDate == null) {
+            lastLoadingDate = label;
+        }
+        lastLoadingDate = ClockManager.max(label, lastLoadingDate);
     }
 
     public Date getStartingDate() {
@@ -107,7 +139,7 @@ public class ArrivalChart {
     }
 
     public void setStartingDate(Date startingDate) throws SQLException {
-        this.startingDate = TokenManagerService.getMinReceptionDate(ClockManager.getSQLDate(startingDate));
+        this.startingDate = ClockManager.getDateOnly(startingDate);
     }
 
     public Date getEndDate() {
@@ -115,37 +147,12 @@ public class ArrivalChart {
     }
 
     public void setEndDate(Date endDate) throws SQLException {
-        this.endDate = TokenManagerService.getMinReceptionDate(ClockManager.getSQLDate(endDate));
+        this.endDate = ClockManager.getDateOnly(endDate);
     }
 
     protected String getDateLabel(Date date) {
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
         return df.format(date);
-    }
-
-    protected LineChart<String, Number> createChart() {
-        xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis(0, 1000, 10);
-        final LineChart<String, Number> lc = new LineChart<>(xAxis, yAxis);
-        // setup chart
-        lc.setId("lineStockDemo");
-        lc.setCreateSymbols(false);
-        lc.setAnimated(false);
-        lc.setLegendVisible(false);
-        lc.setTitle("Arrival Chart Per hour");
-        xAxis.setLabel("Time");
-
-        yAxis.setLabel("Number of Individual");
-        yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis, "", null));
-        // add starting data
-        caseDataSeries = new XYChart.Series<>();
-        caseDataSeries.setName("Case Data");
-        individualDataSeries = new XYChart.Series<>();
-        individualDataSeries.setName("Individual Data");
-
-        lc.getData().add(individualDataSeries);
-        lc.getData().add(caseDataSeries);
-        return lc;
     }
 
     public void play() {
@@ -156,9 +163,8 @@ public class ArrivalChart {
         animation.pause();
     }
 
-    public void start(JFXPanel panel) throws Exception {
-        init(panel);
-        play();
+    private void clearData() {
+        webview.getEngine().executeScript("removeData()");
     }
 
 }

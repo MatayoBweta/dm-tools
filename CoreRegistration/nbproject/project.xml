@@ -157,6 +157,7 @@
             <public-packages>
                 <package>org.unhcr.eg.registration.security</package>
                 <package>org.unhcr.eg.registration.security.action</package>
+                <package>org.unhcr.eg.registration.security.date</package>
                 <package>org.unhcr.eg.registration.security.em</package>
                 <package>org.unhcr.eg.registration.security.exchange</package>
                 <package>org.unhcr.eg.registration.security.filechooser.filter</package>

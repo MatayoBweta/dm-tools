@@ -37,6 +37,27 @@ public class ClockManager {
         return numberOfYear;
     }
 
+    /**
+     * Returns the maximum of two dates. A null date is treated as being less
+     * than any non-null date.
+     *
+     * @param d1
+     * @param d2
+     * @return
+     */
+    public static Date max(Date d1, Date d2) {
+        if (d1 == null && d2 == null) {
+            return null;
+        }
+        if (d1 == null) {
+            return d2;
+        }
+        if (d2 == null) {
+            return d1;
+        }
+        return (d1.after(d2)) ? d1 : d2;
+    }
+
     public static int getNumberOfDays(Calendar c1, Calendar c2) {
         int numberOfDays;
         numberOfDays = (int) ((c1.getTime().getTime() - c2.getTime().getTime()) / MILLISECONDS_PER_DAY);

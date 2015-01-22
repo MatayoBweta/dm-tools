@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Arrival Dashboard</title>
+
+        <script type="text/javascript" src="jquery-1.8.2.min.js"></script>
+        <style type="text/css">
+            ${demo.css}
+        </style>
+        <script type="text/javascript">
+
+            function addIndividuals(data) {
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[0].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
+
+            function addCases(data) {
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[1].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
+
+            function addCumulateIndividuals(data) {
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[2].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
+
+            function addCumulateCases(data) {
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[3].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
+
+            function removeData() {
+                for (i = 0; i < $('#container').highcharts().series.length; i++) {
+                    $('#container').highcharts().series[i].setData([]);
+                }
+            }
+
+            $(function () {
+                $('#container').highcharts('StockChart', {
+                    chart: {
+                        zoomType: 'x'
+                    },
+                    rangeSelector: {
+                        buttons: [{
+                                type: 'day',
+                                count: 3,
+                                text: '3d'
+                            }, {
+                                type: 'week',
+                                count: 1,
+                                text: '1w'
+                            }, {
+                                type: 'month',
+                                count: 1,
+                                text: '1m'
+                            }, {
+                                type: 'month',
+                                count: 6,
+                                text: '6m'
+                            }, {
+                                type: 'year',
+                                count: 1,
+                                text: '1y'
+                            }, {
+                                type: 'all',
+                                text: 'All'
+                            }],
+                        selected: 3
+                    },
+                    title: {
+                        text: 'Arrivals of Persons of concern'
+                    }, legend: {
+                        enabled: true,
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                    },
+                    series: [{
+                            name: 'Individuals',
+                            step: true,
+                            tooltip: {
+                                valueDecimals: 0
+                            }, turboThreshold: 0
+                        }, {
+                            name: 'Cases',
+                            step: true,
+                            tooltip: {
+                                valueDecimals: 0
+                            }, turboThreshold: 0
+                        }, {
+                            name: 'Cumulate Individuals',
+                            step: true,
+                            tooltip: {
+                                valueDecimals: 0
+                            }, turboThreshold: 0
+                        }, {
+                            name: 'Cumulate Cases',
+                            step: true,
+                            tooltip: {
+                                valueDecimals: 0
+                            }, turboThreshold: 0
+                        }]
+                });
+
+            });
+        </script>
+    </head>
+    <body>
+        <script src="highstock.js"></script>
+        <script src="exporting.js"></script>
+
+        <div id="container" style="height: 400px; min-width: 310px"></div>
+    </body>
+</html>

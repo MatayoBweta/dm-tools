@@ -5,16 +5,17 @@
  */
 package org.unhcr.eg.registration.tool.token.printing.service;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-import org.openide.util.Exceptions;
 import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
 
@@ -110,54 +111,29 @@ public class TokenManagerService {
         return date;
     }
 
-    private static final String RECEPTION_CASE_DATA = "SELECT t1.AccesDateTime, t1.NumberOfCases, SUM(t2.NumberOfCases) as CumulativeCases\n"
-            + "FROM  vAttendanceOffice t1\n"
-            + "INNER JOIN vAttendanceOffice t2 ON t1.AccesDateTime >= t2.AccesDateTime\n"
-            + "	WHERE \n"
-            + "	DATEADD(d, DATEDIFF(d, 0, t1.AccesDateTime), 0) BETWEEN DATEADD(d, DATEDIFF(d, 0, ?), 0) AND DATEADD(d, DATEDIFF(d, 0, ?), 0)\n"
-            + "GROUP by t1.AccesDateTime, t1.NumberOfCases\n"
-            + "ORDER by t1.AccesDateTime\n";
+    private static final String RECEPTION_CASE_DATA = "{call GetDailyCumulativeVisit(?,?,?)}";
 
-    private static final String RECEPTION_INDIVIDUAL_DATA = "SELECT t1.AccesDateTime, t1.PotentialNumberOfIndividuals, SUM(t2.PotentialNumberOfIndividuals) as CumulativeIndividuals\n"
-            + "FROM  vAttendanceOffice t1\n"
-            + "INNER JOIN vAttendanceOffice t2 ON t1.AccesDateTime >= t2.AccesDateTime\n"
-            + "	WHERE \n"
-            + "	DATEADD(d, DATEDIFF(d, 0, t1.AccesDateTime), 0) BETWEEN DATEADD(d, DATEDIFF(d, 0, ?), 0) AND DATEADD(d, DATEDIFF(d, 0, ?), 0)\n"
-            + "GROUP by t1.AccesDateTime, t1.PotentialNumberOfIndividuals\n"
-            + "ORDER by t1.AccesDateTime";
-
-    public static TreeMap<Date, AccessTimeReport> getCaseAccessTimeReport(Date startingDate, Date endDate) throws SQLException {
-        TreeMap<Date, AccessTimeReport> accessTimeReports = new TreeMap<>();
+    public static TreeMap<Timestamp, List<AccessTimeReport>> getAccessTimeReport(Date startingDate, Date endDate, Date lastUploadDate) throws SQLException {
+        TreeMap<Timestamp, List<AccessTimeReport>> accessTimeReports = new TreeMap<>();
         Connection connection = EntityManagerSingleton.getDefault().getConnection();
         String getCaseData = RECEPTION_CASE_DATA;
-        PreparedStatement statement = connection.prepareStatement(getCaseData);
+        CallableStatement statement = connection.prepareCall(getCaseData);
         statement.setDate(1, startingDate);
         statement.setDate(2, endDate);
+        statement.setTimestamp(3, new java.sql.Timestamp(lastUploadDate.getTime()));
         ResultSet rs = statement.executeQuery();
         while (rs.next()) {
-            Date accesDateTime = rs.getDate("AccesDateTime");
-            Integer numberOfCases = rs.getInt("NumberOfCases");
-            Integer cumulativeCases = rs.getInt("CumulativeCases");
-            accessTimeReports.put(accesDateTime, new AccessTimeReport(accesDateTime, numberOfCases, cumulativeCases));
-        }
-        return accessTimeReports;
-    }
+            Timestamp accesDateTime = rs.getTimestamp("AccesDateTime");
+            Integer number = rs.getInt("TotalNumber");
+            Integer cumulativeNumber = rs.getInt("CumulativeDailyTotalNumber");
+            String gate = rs.getString("Gate");
+            String typeOfNumber = rs.getString("TypeOfNumber");
+            if (accessTimeReports.get(accesDateTime) == null) {
+                accessTimeReports.put(accesDateTime, new ArrayList<>());
+            }
+            accessTimeReports.get(accesDateTime).add(new AccessTimeReport(accesDateTime, gate, typeOfNumber, number, cumulativeNumber));
 
-    public static TreeMap<Date, AccessTimeReport> getIndividualAccessTimeReport(Date startingDate, Date endDate) throws SQLException {
-        TreeMap<Date, AccessTimeReport> accessTimeReports = new TreeMap<>();
-        Connection connection = EntityManagerSingleton.getDefault().getConnection();
-        String getCaseData = RECEPTION_INDIVIDUAL_DATA;
-        PreparedStatement statement = connection.prepareStatement(getCaseData);
-        statement.setDate(1, startingDate);
-        statement.setDate(2, endDate);
-        ResultSet rs = statement.executeQuery();
-        while (rs.next()) {
-            Date accesDateTime = rs.getDate("AccesDateTime");
-            Integer numberOfCases = rs.getInt("PotentialNumberOfIndividuals");
-            Integer cumulativeCases = rs.getInt("CumulativeIndividuals");
-            accessTimeReports.put(accesDateTime, new AccessTimeReport(accesDateTime, numberOfCases, cumulativeCases));
         }
-
         return accessTimeReports;
     }
 }
