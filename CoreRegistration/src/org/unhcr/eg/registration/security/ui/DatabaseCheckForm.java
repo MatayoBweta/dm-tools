@@ -42,7 +42,7 @@ import org.unhcr.eg.registration.security.DatabaseUtility;
  *
  * @author Matayo Bweta Doudoux Stanyslas
  */
-public class DatabaseCheckForm extends JPanel implements java.awt.event.ActionListener {
+public final class DatabaseCheckForm extends JPanel implements java.awt.event.ActionListener {
 
     private static DatabaseCheckForm instance;
     private JButton save;
@@ -164,7 +164,7 @@ public class DatabaseCheckForm extends JPanel implements java.awt.event.ActionLi
         serverUserNameText.setText(Crypto.decrypt(node.get("database.user", Crypto.encrypt("proGresDBUser"))));
         serverPasswordText.setText(Crypto.decrypt(node.get("database.password", Crypto.encrypt("sqladmin"))));
         serverHostNameText.setText(node.get("database.hostname", "localhost"));
-        serverPortText.setText(new Integer(node.getInt("database.port", 1433)).toString());
+        serverPortText.setText(Integer.toString(node.getInt("database.port", 1433)));
         serverDatabaseNameText.setText(node.get("database.name", "proGres"));
     }
 

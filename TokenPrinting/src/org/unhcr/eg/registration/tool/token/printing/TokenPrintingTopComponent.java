@@ -82,6 +82,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
                 arrivalChart = new ArrivalChart();
                 reportPanel.add(arrivalChart, BorderLayout.CENTER);
                 arrivalChart.getFreshData();
+                reportPanel.repaint();
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }

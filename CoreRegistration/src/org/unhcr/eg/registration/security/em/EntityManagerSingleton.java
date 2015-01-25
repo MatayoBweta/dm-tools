@@ -33,7 +33,11 @@ public abstract class EntityManagerSingleton {
 
     public abstract EntityManagerFactory getEntityManagerFactoryForproGres() throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException, InvalidKeyException;
 
+    public abstract EntityManagerFactory getEntityManagerFactoryForScheduler() throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException, InvalidKeyException;
+
     public abstract Connection getConnection();
-    
+
     public abstract Connection getConnectionForproGres();
+    
+   public abstract Connection getConnectionForScheduler();
 }

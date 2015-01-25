@@ -45,7 +45,7 @@ public class DefaultEntityManagerSingleton extends EntityManagerSingleton {
             try {
                 Preferences node = NbPreferences.root();
                 Map props = new HashMap();
-                props.put("javax.persistence.jdbc.url", DatabaseUtility.getMSSQLDatabaseURL(node.get("database.hostname", "localhost"), Integer.toString(node.getInt("database.port", 1433)).toString(), node.get("database.name", "Staff")));
+                props.put("javax.persistence.jdbc.url", DatabaseUtility.getMSSQLDatabaseURL(node.get("database.hostname", "localhost"), Integer.toString(node.getInt("database.port", 1433)), node.get("database.name", "Staff")));
                 props.put("javax.persistence.jdbc.user", Crypto.decrypt(node.get("database.user", Crypto.encrypt("Level1DBUser"))));
                 props.put("javax.persistence.jdbc.password", Crypto.decrypt(node.get("database.password", Crypto.encrypt("sqladmin"))));
                 entityManagerFactory = Persistence.createEntityManagerFactory("LocalPU", props);
@@ -62,7 +62,7 @@ public class DefaultEntityManagerSingleton extends EntityManagerSingleton {
             try {
                 Preferences node = NbPreferences.root();
                 Map props = new HashMap();
-                props.put("javax.persistence.jdbc.url", DatabaseUtility.getMSSQLDatabaseURL(node.get("database.hostname.proGres", "localhost"), Integer.toString(node.getInt("database.port.proGres", 1433)).toString(), node.get("database.name.proGres", "proGres")));
+                props.put("javax.persistence.jdbc.url", DatabaseUtility.getMSSQLDatabaseURL(node.get("database.hostname.proGres", "localhost"), Integer.toString(node.getInt("database.port.proGres", 1433)), node.get("database.name.proGres", "proGres")));
                 props.put("javax.persistence.jdbc.user", Crypto.decrypt(node.get("database.user.proGres", Crypto.encrypt("proGres"))));
                 props.put("javax.persistence.jdbc.password", Crypto.decrypt(node.get("database.password.proGres", Crypto.encrypt("sqladmin"))));
                 entityManagerFactoryForproGres = Persistence.createEntityManagerFactory("proGresPU", props);
@@ -80,7 +80,7 @@ public class DefaultEntityManagerSingleton extends EntityManagerSingleton {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
             Preferences node = NbPreferences.root();
             String hostName = node.get("database.hostname", "localhost");
-            String port = new Integer(node.getInt("database.port", 1433)).toString();
+            String port = Integer.toString(node.getInt("database.port", 1433));
             String database = node.get("database.name", "proGres");
             String url = DatabaseUtility.getMSSQLDatabaseURL(hostName, port, database);
             String userID = Crypto.decrypt(node.get("database.user", Crypto.encrypt("proGresDBUser")));
@@ -99,17 +99,25 @@ public class DefaultEntityManagerSingleton extends EntityManagerSingleton {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
             Preferences node = NbPreferences.root();
             String hostName = node.get("database.hostname.proGres", "localhost");
-            String port = new Integer(node.getInt("database.port.proGres", 1433)).toString();
+            String port = Integer.toString(node.getInt("database.port.proGres", 1433));
             String database = node.get("database.name.proGres", "proGres");
             String url = DatabaseUtility.getMSSQLDatabaseURL(hostName, port, database);
             String userID = Crypto.decrypt(node.get("database.user.proGres", Crypto.encrypt("proGresDBUser")));
             String password = Crypto.decrypt(node.get("database.password.proGres", Crypto.encrypt("sqladmin")));
             connection = DriverManager.getConnection(url, userID, password);
-        } catch (GeneralSecurityException | SQLException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (GeneralSecurityException | SQLException | ClassNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }
         return connection;
+    }
+
+    @Override
+    public EntityManagerFactory getEntityManagerFactoryForScheduler() throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException, InvalidKeyException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Connection getConnectionForScheduler() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
