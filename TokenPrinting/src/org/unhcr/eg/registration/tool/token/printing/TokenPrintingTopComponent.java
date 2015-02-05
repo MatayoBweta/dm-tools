@@ -34,9 +34,11 @@ import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
 import org.unhcr.eg.registration.security.exchange.ExcelSaver;
 import org.unhcr.eg.registration.tool.token.printing.chart.ArrivalChart;
 import org.unhcr.eg.registration.tool.token.printing.models.Gate;
+import org.unhcr.eg.registration.tool.token.printing.models.TokenDetails;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitCategory;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitReason;
 import org.unhcr.eg.registration.tool.token.printing.service.PrinterManager;
+import org.unhcr.eg.registration.tool.token.printing.service.TokenManagerService;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenSummaryTableModel;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenTableModel;
 import org.unhcr.eg.registration.tool.token.printing.service.VisitCategoryController;
@@ -139,6 +141,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
         printTokenButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         gateComboBox = new javax.swing.JComboBox();
+        registerComplainsButton = new javax.swing.JButton();
         reportPanel = new javax.swing.JPanel();
         jToolBar3 = new javax.swing.JToolBar();
         reloadChartButton = new javax.swing.JButton();
@@ -246,6 +249,13 @@ public final class TokenPrintingTopComponent extends TopComponent {
         jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, gates, gateComboBox);
         bindingGroup.addBinding(jComboBoxBinding);
 
+        org.openide.awt.Mnemonics.setLocalizedText(registerComplainsButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.registerComplainsButton.text")); // NOI18N
+        registerComplainsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                registerComplainsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -264,7 +274,8 @@ public final class TokenPrintingTopComponent extends TopComponent {
                             .addComponent(jLabel2)
                             .addComponent(categoryComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(reasonComboBox, 0, 246, Short.MAX_VALUE)))
-                    .addComponent(printTokenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(printTokenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(registerComplainsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -286,7 +297,9 @@ public final class TokenPrintingTopComponent extends TopComponent {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(gateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 90, Short.MAX_VALUE)
+                .addComponent(registerComplainsButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(printTokenButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(printTokenButton)
@@ -626,7 +639,8 @@ public final class TokenPrintingTopComponent extends TopComponent {
 
     protected void effectivePrintToken(final String caseNumber, final String reason, String gate, int numberOfIndividuals) throws HeadlessException {
 
-        if (caseNumber.equals("NR")) {
+        if (caseNumber.equals(
+                "NR")) {
             try {
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportLocation);
                 manager = new PrinterManager(is, new HashMap<>());
@@ -669,7 +683,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         caseNumberTextField.setEnabled(false);
         final Gate gate = (Gate) gateComboBox.getSelectedItem();
         action = new LongTaskBackgroundAction("Print New Token") {
-
             @Override
             protected void mainAction() {
                 int option = JOptionPane.showConfirmDialog(printTokenButton, "Do you want to print Token for new family?", "New Registration", JOptionPane.YES_NO_OPTION);
@@ -824,16 +837,47 @@ public final class TokenPrintingTopComponent extends TopComponent {
     }//GEN-LAST:event_reloadChartButtonActionPerformed
 
     private void dailyToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dailyToggleButtonActionPerformed
-        System.out.println("dailyToggleButtonActionPerformed ");
         arrivalChart.getOfflineData(0);
 
     }//GEN-LAST:event_dailyToggleButtonActionPerformed
 
     private void cumulativeToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cumulativeToggleButtonActionPerformed
-        System.out.println("cumulativeToggleButtonActionPerformed ");
         arrivalChart.getOfflineData(1);
 
     }//GEN-LAST:event_cumulativeToggleButtonActionPerformed
+
+    private void registerComplainsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerComplainsButtonActionPerformed
+        String txt = "Number Of Individuals: ";
+        String title = "Number of people Inquiring";
+
+        NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(txt, title);
+        input.setInputText("1"); // specify a default name
+        Object result = DialogDisplayer.getDefault().notify(input);
+        if (result != NotifyDescriptor.OK_OPTION) {
+            return;
+        }
+        String userInput = input.getInputText();
+        if (!userInput.matches("\\d+")) {
+            return;
+        }
+        final String caseNumber = caseNumberTextField.getText();
+        final VisitReason reason = (VisitReason) reasonComboBox.getSelectedItem();
+        final Gate gate = (Gate) gateComboBox.getSelectedItem();
+
+        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+            try {
+                TokenDetails details = TokenManagerService.addToken(caseNumber, reason.getReasonCode(), gate.getGateName(), Integer.parseInt(userInput));
+                NotifyDescriptor.Message message = new NotifyDescriptor.Message("Complains Added Successfully "+details.toString(), NotifyDescriptor.PLAIN_MESSAGE);
+                DialogDisplayer.getDefault().notify(message);
+            } catch (SQLException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else {
+            NotifyDescriptor.Message message = new NotifyDescriptor.Message("Case Number not present in proGres\nPlease check again", NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(message);
+        }
+
+    }//GEN-LAST:event_registerComplainsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -880,6 +924,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private javax.swing.JButton printTokenButton;
     private javax.swing.JButton printTokenButton1;
     private javax.swing.JComboBox reasonComboBox;
+    private javax.swing.JButton registerComplainsButton;
     private javax.swing.JButton reloadChartButton;
     private javax.swing.JPanel reportPanel;
     private org.jdesktop.swingx.JXTable summaryXTable;

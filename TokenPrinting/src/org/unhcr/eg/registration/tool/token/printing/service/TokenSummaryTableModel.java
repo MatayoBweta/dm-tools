@@ -13,7 +13,7 @@ import org.unhcr.eg.registration.security.jdbc.JDBCTableModel;
 
 /**
  *
- * @author UNHCRuser
+ * @author Stanyslas Matayo
  */
 public class TokenSummaryTableModel extends JDBCTableModel {
 
@@ -73,5 +73,4 @@ public class TokenSummaryTableModel extends JDBCTableModel {
         getPreparedQueryContents(conn, GET_DATE_TOKEN, hashMap);
         refreshTable();
     }
-
 }

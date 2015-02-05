@@ -118,7 +118,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                                   <Component id="printTokenButton1" alignment="0" pref="246" max="32767" attributes="0"/>
@@ -135,6 +135,7 @@
                                       </Group>
                                   </Group>
                                   <Component id="printTokenButton" max="32767" attributes="0"/>
+                                  <Component id="registerComplainsButton" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace pref="17" max="32767" attributes="0"/>
                           </Group>
@@ -159,7 +160,9 @@
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="gateComboBox" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="90" max="32767" attributes="0"/>
+                              <Component id="registerComplainsButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="printTokenButton1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="printTokenButton" min="-2" max="-2" attributes="0"/>
@@ -283,6 +286,16 @@
                       <BindingProperties>
                         <BindingProperty name="elements" source="gates" target="gateComboBox" targetPath="elements" updateStrategy="0" immediately="false"/>
                       </BindingProperties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="registerComplainsButton">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                          <ResourceString bundle="org/unhcr/eg/registration/tool/token/printing/Bundle.properties" key="TokenPrintingTopComponent.registerComplainsButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="registerComplainsButtonActionPerformed"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>

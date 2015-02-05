@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.TreeMap;
 import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
+import org.unhcr.eg.registration.tool.token.printing.models.TokenDetails;
 
 /**
  *
@@ -112,6 +113,7 @@ public class TokenManagerService {
     }
 
     private static final String RECEPTION_CASE_DATA = "{call GetDailyCumulativeVisit(?,?,?)}";
+    private static final String GET_NEXT_TOKEN = "{call Get_Token_Details_New(?,?,?,?)}";
 
     public static TreeMap<Timestamp, List<AccessTimeReport>> getAccessTimeReport(Date startingDate, Date endDate, Date lastUploadDate) throws SQLException {
         TreeMap<Timestamp, List<AccessTimeReport>> accessTimeReports = new TreeMap<>();
@@ -132,8 +134,41 @@ public class TokenManagerService {
                 accessTimeReports.put(accesDateTime, new ArrayList<>());
             }
             accessTimeReports.get(accesDateTime).add(new AccessTimeReport(accesDateTime, gate, typeOfNumber, number, cumulativeNumber));
-
         }
         return accessTimeReports;
     }
+
+    public static TokenDetails addToken(String caseNumber, String reason, String gate, int numberOfIndividuals) throws SQLException {
+        System.out.println("Inside the method");
+        Connection connection = EntityManagerSingleton.getDefault().getConnection();
+        TokenDetails details = new TokenDetails();
+        String getNextToken = GET_NEXT_TOKEN;
+        CallableStatement statement = connection.prepareCall(getNextToken);
+        statement.setString(1, caseNumber);
+        statement.setString(2, reason);
+        statement.setString(3, gate);
+        statement.setInt(4, numberOfIndividuals);
+        ResultSet rs = statement.executeQuery();
+        if (rs.next()) {
+            details.setAccesDateTime(new java.util.Date(rs.getTimestamp("AccesDateTime").getTime()));
+            details.setCaseNumber(rs.getString("CaseNumber").toUpperCase());
+            details.setConditions(rs.getString("Conditions"));
+            details.setFamilySize(rs.getInt("FamilySize"));
+            details.setGateName(rs.getString("GateName"));
+            details.setIndividualGUID(rs.getString("IndividualGUID"));
+            
+            details.setIssueToFix(rs.getString("IssueToFix"));
+            details.setLocation(rs.getString("Location"));
+            details.setTokenDistributedGUID(rs.getString("TokenDistributedGUID"));
+            details.setTokenNumber(rs.getInt("TokenNumber"));
+            
+            details.setTokenStatus(rs.getString("TokenStatus"));
+            details.setVisitNumber(rs.getInt("VisitNumber"));
+            details.setVisitReason(rs.getString("VisitReason"));
+            details.setReasonForVisit(rs.getString("ReasonForVisit"));
+        }
+        return details;
+    }
+
+
 }

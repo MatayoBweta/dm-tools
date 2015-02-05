@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Token_Reception_add" language="groovy" pageWidth="226" pageHeight="850" columnWidth="198" leftMargin="14" rightMargin="14" topMargin="14" bottomMargin="14" uuid="964bc8bf-9541-4bce-b4c7-40ad36f586b7">
 	<property name="ireport.zoom" value="1.9487171000000014"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="96"/>
+	<property name="ireport.y" value="48"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="0.0" lineColor="#000000"/>
@@ -63,8 +63,9 @@ WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'
 	<parameter name="Case_Number" class="java.lang.String"/>
 	<parameter name="Visit_Reason" class="java.lang.String"/>
 	<parameter name="Gate_Name" class="java.lang.String"/>
+	<parameter name="Number_Individual" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[EXEC Get_Token_Details_New $P{Case_Number}, $P{Visit_Reason}, $P{Gate_Name}]]>
+		<![CDATA[EXEC Get_Token_Details_New $P{Case_Number}, $P{Visit_Reason}, $P{Gate_Name}, $P{Number_Individual}]]>
 	</queryString>
 	<field name="TokenDistributedGUID" class="java.lang.String"/>
 	<field name="TokenNumber" class="java.lang.Integer"/>
