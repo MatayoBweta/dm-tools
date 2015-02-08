@@ -105,7 +105,7 @@ public class VisitCategoryController {
     public static boolean checkDuplicateToken(String visitReason, String caseNumber, String gate) {
         try {
             Connection connection = EntityManagerSingleton.getDefault().getConnection();
-            String getCategory = "SELECT VisitReason, CaseNumber FROM tmp_TokenReport WHERE VisitReason = ? AND CaseNumber = ? AND GateName = ? AND DATEADD(d, DATEDIFF(d, 0, AccesDateTime), 0) = DATEADD(d, DATEDIFF(d, 0, GEDATE()), 0)";
+            String getCategory = "SELECT VisitReason, CaseNumber FROM tmp_TokenReport WHERE VisitReason = ? AND CaseNumber = ? AND GateName = ? AND DATEADD(d, DATEDIFF(d, 0, AccesDateTime), 0) = DATEADD(d, DATEDIFF(d, 0, GETDATE()), 0)";
             PreparedStatement statement = connection.prepareStatement(getCategory);
             statement.setString(1, visitReason);
             statement.setString(2, caseNumber);
