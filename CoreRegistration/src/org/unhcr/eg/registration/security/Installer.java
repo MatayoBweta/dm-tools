@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -55,7 +56,8 @@ public class Installer extends ModuleInstall {
         //System.setProperty("netbeans.exception.alert.min.level", "99999");
         //To remove the annoying error dialog box
         //System.setProperty("netbeans.exception.report.min.level", "99999");
-        new JFXPanel(); // initializes JavaFX environment
+        JFXPanel jfxPanel = new JFXPanel(); // initializes JavaFX environment
+        Platform.setImplicitExit(false);
         SwingUtilities.invokeLater(() -> {
             JFrame frame = (JFrame) WindowManager.getDefault().getMainWindow();
             frame.setTitle("Data  Management Tools");
@@ -151,9 +153,9 @@ public class Installer extends ModuleInstall {
     @Override
     public void close() {
         super.close();
-        for (Runnable onClose : runOnClose) {
+        runOnClose.stream().forEach((onClose) -> {
             onClose.run();
-        }
+        });
 
     }
 
@@ -186,7 +188,7 @@ public class Installer extends ModuleInstall {
         DatabaseCheckFormproGres formDB = null;
         Preferences node = NbPreferences.root();
         String hostName = node.get("database.hostname.proGres", "localhost");
-        String port = new Integer(node.getInt("database.port.proGres", 1433)).toString();
+        String port = Integer.toString(node.getInt("database.port.proGres", 1433));
         String database = node.get("database.name.proGres", "proGres");
         String url = DatabaseUtility.getMSSQLDatabaseURL(hostName, port, database);
         String userID = Crypto.decrypt(node.get("database.user.proGres", Crypto.encrypt("proGresDBUser")));

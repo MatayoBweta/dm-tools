@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxfxmltest.FXMLDocumentController">
+   <children>
+      <AnchorPane id="AnchorPane" prefHeight="340.0" prefWidth="320">
+         <children>
+            <Label layoutX="14.0" layoutY="14.0" text="Case Number" />
+            <TextField fx:id="caseNumberText" layoutX="12.0" layoutY="31.0" prefHeight="25.0" prefWidth="264.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="45.0" />
+            <Label layoutX="14.0" layoutY="64.0" text="Group Of Service" />
+            <ComboBox fx:id="groupeOfServiceCombobox" layoutX="11.0" layoutY="81.0" prefHeight="25.0" prefWidth="297.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="12.0" />
+            <ComboBox fx:id="serviceRequestCombobox" layoutX="8.0" layoutY="135.0" prefHeight="25.0" prefWidth="297.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="12.0" />
+            <ComboBox fx:id="gateComboboX" layoutX="11.0" layoutY="186.0" prefHeight="25.0" prefWidth="297.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="12.0" />
+            <Label layoutX="14.0" layoutY="118.0" text="Service Requested" />
+            <Label layoutX="14.0" layoutY="169.0" text="Gate" />
+            <Button layoutX="273.0" layoutY="31.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="36.0" text="..." AnchorPane.rightAnchor="11.0" />
+            <Label layoutX="13.0" layoutY="219.0" text="Phone Number" />
+            <TextField fx:id="phoneNumber" layoutX="11.0" layoutY="236.0" prefHeight="25.0" prefWidth="297.0" />
+         </children>
+      </AnchorPane>
+      <Region prefHeight="26.0" prefWidth="320.0" VBox.vgrow="ALWAYS" />
+      <VBox prefHeight="124.0" prefWidth="320.0" spacing="10.0">
+         <children>
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Request Service" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="New Registration" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Print Token For entrance" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </VBox>
+   </children>
+</VBox>

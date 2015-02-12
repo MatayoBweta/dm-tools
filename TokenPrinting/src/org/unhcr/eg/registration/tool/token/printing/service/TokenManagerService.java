@@ -5,6 +5,13 @@
  */
 package org.unhcr.eg.registration.tool.token.printing.service;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
@@ -14,11 +21,27 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import javafx.application.Platform;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import net.sf.jasperreports.engine.JRException;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.Exceptions;
+import org.unhcr.eg.registration.security.action.LongTaskBackgroundAction;
 import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
+import org.unhcr.eg.registration.tool.token.printing.CommentPanelRequestService;
+import org.unhcr.eg.registration.tool.token.printing.ComplainToken;
+import org.unhcr.eg.registration.tool.token.printing.TokenPrintingTopComponent;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
+import org.unhcr.eg.registration.tool.token.printing.models.CommentInput;
+import org.unhcr.eg.registration.tool.token.printing.models.Gate;
 import org.unhcr.eg.registration.tool.token.printing.models.TokenDetails;
+import org.unhcr.eg.registration.tool.token.printing.models.VisitReason;
 
 /**
  *
@@ -113,7 +136,7 @@ public class TokenManagerService {
     }
 
     private static final String RECEPTION_CASE_DATA = "{call GetDailyCumulativeVisit(?,?,?)}";
-    private static final String GET_NEXT_TOKEN = "{call Get_Token_Details_New(?,?,?,?)}";
+    private static final String GET_NEXT_TOKEN = "{call Get_Token_Details_New(?,?,?,?,?,?)}";
 
     public static TreeMap<Timestamp, List<AccessTimeReport>> getAccessTimeReport(Date startingDate, Date endDate, Date lastUploadDate) throws SQLException {
         TreeMap<Timestamp, List<AccessTimeReport>> accessTimeReports = new TreeMap<>();
@@ -138,8 +161,7 @@ public class TokenManagerService {
         return accessTimeReports;
     }
 
-    public static TokenDetails addToken(String caseNumber, String reason, String gate, int numberOfIndividuals) throws SQLException {
-        System.out.println("Inside the method");
+    public static TokenDetails addToken(String caseNumber, String reason, String gate, int numberOfIndividuals, String comments) throws SQLException {
         Connection connection = EntityManagerSingleton.getDefault().getConnection();
         TokenDetails details = new TokenDetails();
         String getNextToken = GET_NEXT_TOKEN;
@@ -148,6 +170,9 @@ public class TokenManagerService {
         statement.setString(2, reason);
         statement.setString(3, gate);
         statement.setInt(4, numberOfIndividuals);
+        statement.setString(5, comments);
+        statement.setBoolean(6, Boolean.TRUE);
+
         ResultSet rs = statement.executeQuery();
         if (rs.next()) {
             details.setAccesDateTime(new java.util.Date(rs.getTimestamp("AccesDateTime").getTime()));
@@ -156,19 +181,158 @@ public class TokenManagerService {
             details.setFamilySize(rs.getInt("FamilySize"));
             details.setGateName(rs.getString("GateName"));
             details.setIndividualGUID(rs.getString("IndividualGUID"));
-            
+
             details.setIssueToFix(rs.getString("IssueToFix"));
             details.setLocation(rs.getString("Location"));
             details.setTokenDistributedGUID(rs.getString("TokenDistributedGUID"));
             details.setTokenNumber(rs.getInt("TokenNumber"));
-            
+
             details.setTokenStatus(rs.getString("TokenStatus"));
             details.setVisitNumber(rs.getInt("VisitNumber"));
             details.setVisitReason(rs.getString("VisitReason"));
             details.setReasonForVisit(rs.getString("ReasonForVisit"));
+
+            details.setComments(rs.getString("Comments"));
+            details.setRequestOfService(rs.getBoolean("RequestOfService"));
         }
         return details;
     }
 
+    public static void effectivePreviewToken(final String tokenGUID, String caseNumber, String reportLocation) throws HeadlessException {
+        InputStream is = TokenManagerService.class.getClassLoader().getResourceAsStream(reportLocation);
+        PrinterManager manager = new PrinterManager(is, new HashMap<>());
+        manager.setParameter("TokenDistributedGUID", tokenGUID);
+        manager.previewPrinter("Preview the Token for Case " + caseNumber, "Token " + tokenGUID + " for Case " + caseNumber);
+    }
+
+    public static boolean printTokenAction(final VisitReason reason, final String caseNumber, final Gate gate, String reportLocation) throws HeadlessException {
+        if (VisitCategoryController.checkDuplicateToken(reason.getReasonCode(), caseNumber, gate.getGateName())) {
+            int option = JOptionPane.showConfirmDialog(null, "Token Already Printed\nDo you want to reprint it?", "Duplicate Token", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                return TokenManagerService.effectivePrintToken(caseNumber, reason.getReasonCode(), gate.getGateName(), 0, reportLocation);
+            }
+        } else {
+            return TokenManagerService.effectivePrintToken(caseNumber, reason.getReasonCode(), gate.getGateName(), 0, reportLocation);
+        }
+        return false;
+    }
+
+    public static boolean printTokenAction(String reason, String caseNumber, String gate, String reportLocation) throws HeadlessException {
+        if (VisitCategoryController.checkDuplicateToken(reason, caseNumber, gate)) {
+            int option = JOptionPane.showConfirmDialog(null, "Token Already Printed\nDo you want to reprint it?", "Duplicate Token", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                return TokenManagerService.effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
+            }
+        } else {
+            return TokenManagerService.effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
+        }
+        return false;
+    }
+
+    public static boolean effectivePrintToken(final String caseNumber, final String reason, String gate, int numberOfIndividuals, String reportLocation) throws HeadlessException {
+        if (caseNumber.equals("NR")) {
+            try {
+                fillAndPrintToken(reportLocation, caseNumber, reason, gate, numberOfIndividuals);
+            } catch (JRException | FileNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+            try {
+                fillAndPrintToken(reportLocation, caseNumber, reason, gate, 0);
+            } catch (JRException | FileNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+        return false;
+    }
+
+    protected static void fillAndPrintToken(String reportLocation, final String caseNumber, final String reason, String gate, int numberOfIndividuals) throws FileNotFoundException, JRException {
+        InputStream is = TokenManagerService.class.getClassLoader().getResourceAsStream(reportLocation);
+        PrinterManager manager = new PrinterManager(is, new HashMap<>());
+        manager.setParameter("Case_Number", caseNumber);
+        manager.setParameter("Visit_Reason", reason);
+        manager.setParameter("Gate_Name", gate);
+        manager.setParameter("New_Individuals", numberOfIndividuals);
+        manager.print();
+    }
+
+    public static boolean printNewRegistrationTokenAction(String gate, String reportLocation, ActionEvent evt) {
+        String defaultData = "<html><body contentEditable=\"true\">New Registration</body></html>";
+
+        final CommentInput input = getUserInput("Number of New Registration Requester", defaultData);
+        LongTaskBackgroundAction action;
+        action = new LongTaskBackgroundAction("Print New Token") {
+            @Override
+            protected void mainAction() {
+                int option = JOptionPane.showConfirmDialog(null, "Do you want to print Token for new family?", "New Registration", JOptionPane.YES_NO_OPTION);
+                if (option == JOptionPane.OK_OPTION) {
+                    TokenManagerService.effectivePrintToken("NR", "VIS0001", gate, input.getCount(), reportLocation);
+                }
+            }
+        };
+        action.actionPerformed(evt);
+        return true;
+    }
+
+    public static CommentInput getUserInput(String inputTitle, String defaultData) {
+        CommentPanelRequestService commentPanelRequestService = new CommentPanelRequestService();
+        Platform.runLater(() -> {
+            commentPanelRequestService.init();
+            if (defaultData != null) {
+                commentPanelRequestService.getHTMLEditor().setHtmlText(defaultData);
+            }
+        });
+        JPanel customPanel = new JPanel();
+        customPanel.setPreferredSize(new Dimension(400, 300));
+        customPanel.setLayout(new BorderLayout());
+        customPanel.add(commentPanelRequestService, BorderLayout.CENTER);
+        DialogDescriptor input = new DialogDescriptor(customPanel, inputTitle, true, commentPanelRequestService);
+        input.setOptions(new Object[]{commentPanelRequestService.getOk(), commentPanelRequestService.getCancel()});
+        input.setClosingOptions(new Object[]{});
+        int i = 0;
+        input.addPropertyChangeListener((PropertyChangeEvent evt1) -> {
+            if ("value".equalsIgnoreCase(evt1.getPropertyName())) {
+                // Escape pressed or dialog closed...
+                if (evt1.getNewValue() != null && ((commentPanelRequestService.isValidData() && evt1.getNewValue() == commentPanelRequestService.getOk()) || (evt1.getNewValue() == commentPanelRequestService.getCancel()))) {
+                    input.setClosingOptions(null);
+                } else {
+                    System.out.println("Ok Not valid");
+                }
+            }
+        });
+
+        Object result = DialogDisplayer.getDefault().notify(input);
+        if (result != commentPanelRequestService.getOk()) {
+            return null;
+        }
+        String userInput = commentPanelRequestService.getNumberOfIndividuals();
+        String comments = commentPanelRequestService.getHTMLComments();
+
+        if (!userInput.matches("\\d+")) {
+            return null;
+        }
+        CommentInput commentInput = new CommentInput(comments, Integer.parseInt(userInput));
+        return commentInput;
+    }
+
+    public static void registerServiceRequestAction(String caseNumber, String reasonCode, String gateCode) {
+        CommentInput input = getUserInput("Service Request Details", null);
+        if (input != null) {
+            if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+                try {
+                    TokenDetails details = TokenManagerService.addToken(caseNumber, reasonCode, gateCode, input.getCount(), input.getComments());
+                    ComplainToken form = new ComplainToken(details);
+                    String msg = "Service Request Added Successfully";
+                    DialogDescriptor dd = new DialogDescriptor(form, msg);
+                    DialogDisplayer.getDefault().notify(dd);
+                } catch (SQLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            } else {
+                NotifyDescriptor.Message message = new NotifyDescriptor.Message("Case Number not present in proGres\nPlease check again", NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(message);
+            }
+        }
+    }
 
 }

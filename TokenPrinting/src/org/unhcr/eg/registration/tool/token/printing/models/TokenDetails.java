@@ -41,6 +41,8 @@ public class TokenDetails {
     private String gateName;
     private String reasonForVisit;
     private String individualGUID;
+    private String comments;
+    private boolean requestOfService;
 
     public String getTokenDistributedGUID() {
         return tokenDistributedGUID;
@@ -157,6 +159,22 @@ public class TokenDetails {
     @Override
     public String toString() {
         return "\n tokenNumber=" + tokenNumber + "\n, visitReason=" + visitReason + "\n, visitNumber=" + visitNumber + "\n, caseNumber=" + caseNumber + "\n, familySize=" + familySize + "\n, location=" + location + "\n, accesDateTime=" + accesDateTime + "\n, gateName=" + gateName + "\n, reasonForVisit=" + reasonForVisit;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public boolean isRequestOfService() {
+        return requestOfService;
+    }
+
+    public void setRequestOfService(boolean requestOfService) {
+        this.requestOfService = requestOfService;
     }
 
 }

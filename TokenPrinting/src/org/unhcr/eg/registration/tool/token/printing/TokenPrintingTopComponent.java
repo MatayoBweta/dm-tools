@@ -8,17 +8,21 @@ package org.unhcr.eg.registration.tool.token.printing;
 import com.ezware.oxbow.swingbits.table.filter.TableRowFilterSupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.HeadlessException;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import javafx.application.Platform;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.table.TableColumnModel;
-import net.sf.jasperreports.engine.JRException;
 import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.painter.GlossPainter;
@@ -75,21 +79,32 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private final TokenTableModel tokenTableModel;
     private final TokenSummaryTableModel tokenSummaryTableModel;
     private ArrivalChart arrivalChart;
+    private final SimpleDateFormat sdf = new SimpleDateFormat(
+            "EEE, d MMM yyyy HH:mm:ss");
 
     public TokenPrintingTopComponent() {
         initComponents();
-
+        try {
+            arrivalChart = new ArrivalChart();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        reportPanel.add(arrivalChart, BorderLayout.CENTER);
         Platform.runLater(() -> {
             try {
-                arrivalChart = new ArrivalChart();
-                reportPanel.add(arrivalChart, BorderLayout.CENTER);
+                arrivalChart.init();
                 arrivalChart.getFreshData();
                 reportPanel.repaint();
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
         });
-
+        ActionListener taskPerformer = (ActionEvent evt) -> {
+            timeLabel.setText("<html>" + sdf.format(new Date()));
+        };
+        Timer timer = new Timer(1000, taskPerformer);
+        timer.setRepeats(true);
+        timer.start();
         setName(Bundle.CTL_TokenPrintingTopComponent());
         setToolTipText(Bundle.HINT_TokenPrintingTopComponent());
         tokenTableModel = new TokenTableModel();
@@ -128,7 +143,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         mainHeader = new org.jdesktop.swingx.JXHeader();
         jPanel9 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
-        timeLabel = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         reportPanel = new javax.swing.JPanel();
@@ -150,7 +164,8 @@ public final class TokenPrintingTopComponent extends TopComponent {
         gateComboBox = new javax.swing.JComboBox();
         registerComplainsButton = new javax.swing.JButton();
         jPanel10 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
+        photoLabel = new javax.swing.JLabel();
+        timeLabel = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
@@ -188,12 +203,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         jPanel9.setLayout(new java.awt.BorderLayout());
 
         jPanel11.setLayout(new java.awt.BorderLayout());
-
-        timeLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        timeLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/1423434044_clock_48.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(timeLabel, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.timeLabel.text")); // NOI18N
-        jPanel11.add(timeLabel, java.awt.BorderLayout.CENTER);
-
         jPanel9.add(jPanel11, java.awt.BorderLayout.PAGE_START);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -374,9 +383,14 @@ public final class TokenPrintingTopComponent extends TopComponent {
         jPanel10.setBackground(new java.awt.Color(204, 204, 204));
         jPanel10.setLayout(new java.awt.BorderLayout());
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/Token_System.jpg"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel4.text")); // NOI18N
-        jPanel10.add(jLabel4, java.awt.BorderLayout.CENTER);
+        photoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/Token_System.jpg"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(photoLabel, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.photoLabel.text")); // NOI18N
+        jPanel10.add(photoLabel, java.awt.BorderLayout.CENTER);
+
+        timeLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        timeLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/1423434044_clock_48.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(timeLabel, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.timeLabel.text")); // NOI18N
+        jPanel10.add(timeLabel, java.awt.BorderLayout.NORTH);
 
         jPanel9.add(jPanel10, java.awt.BorderLayout.WEST);
 
@@ -616,14 +630,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
                 final String caseNumber = caseNumberTextField.getText();
                 final VisitReason reason = (VisitReason) reasonComboBox.getSelectedItem();
                 final Gate gate = (Gate) gateComboBox.getSelectedItem();
-                if (VisitCategoryController.checkDuplicateToken(reason.getReasonCode(), caseNumber, gate.getGateName())) {
-                    int option = JOptionPane.showConfirmDialog(printTokenButton, "Token Already Printed\nDo you want to reprint it?", "Duplicate Token", JOptionPane.YES_NO_OPTION);
-                    if (option == JOptionPane.OK_OPTION) {
-                        effectivePrintToken(caseNumber, reason.getReasonCode(), gate.getGateName());
-                    }
-                } else {
-                    effectivePrintToken(caseNumber, reason.getReasonCode(), gate.getGateName());
-                }
+                TokenManagerService.printTokenAction(reason, caseNumber, gate, reportLocation);
             }
 
         };
@@ -631,84 +638,13 @@ public final class TokenPrintingTopComponent extends TopComponent {
 
     }//GEN-LAST:event_printTokenButtonActionPerformed
 
-    protected void effectivePrintToken(final String caseNumber, final String reason, String gate) throws HeadlessException {
-
-        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
-            try {
-                InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportLocation);
-                manager = new PrinterManager(is, new HashMap<>());
-                manager.setParameter("Case_Number", caseNumber);
-                manager.setParameter("Visit_Reason", reason);
-                manager.setParameter("Gate_Name", gate);
-                manager.setParameter("New_Individuals", 0);
-                manager.print();
-            } catch (JRException | FileNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        } else {
-            JOptionPane.showMessageDialog(caseNumberTextField, "Case Number not present in proGres\nPlease check again", "Wrong Case Number", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    protected void effectivePrintToken(final String caseNumber, final String reason, String gate, int numberOfIndividuals) throws HeadlessException {
-
-        if (caseNumber.equals(
-                "NR")) {
-            try {
-                InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportLocation);
-                manager = new PrinterManager(is, new HashMap<>());
-                manager.setParameter("Case_Number", caseNumber);
-                manager.setParameter("Visit_Reason", reason);
-                manager.setParameter("Gate_Name", gate);
-                manager.setParameter("New_Individuals", numberOfIndividuals);
-                manager.print();
-            } catch (JRException | FileNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        } else {
-            JOptionPane.showMessageDialog(caseNumberTextField, "Case Number not present in proGres\nPlease check again", "Wrong Case Number", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    protected void effectivePreviewToken(final String tokenGUID, String caseNumber) throws HeadlessException {
-
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(reportViewLocation);
-        manager = new PrinterManager(is, new HashMap<>());
-        manager.setParameter("TokenDistributedGUID", tokenGUID);
-        manager.previewPrinter("Preview the Token for Case " + caseNumber, "Token " + tokenGUID + " for Case " + caseNumber);
-    }
 
     private void printTokenButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printTokenButton1ActionPerformed
-        String txt = "Number Of Individuals: ";
-        String title = "New Registration";
-
-        NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(txt, title);
-        input.setInputText("1"); // specify a default name
-        Object result = DialogDisplayer.getDefault().notify(input);
-        if (result != NotifyDescriptor.OK_OPTION) {
-            return;
-        }
-        String userInput = input.getInputText();
-        if (!userInput.matches("\\d+")) {
-            return;
-        }
-        LongTaskBackgroundAction action;
-        caseNumberTextField.setEnabled(false);
         final Gate gate = (Gate) gateComboBox.getSelectedItem();
-        action = new LongTaskBackgroundAction("Print New Token") {
-            @Override
-            protected void mainAction() {
-                int option = JOptionPane.showConfirmDialog(printTokenButton, "Do you want to print Token for new family?", "New Registration", JOptionPane.YES_NO_OPTION);
-                if (option == JOptionPane.OK_OPTION) {
-                    effectivePrintToken("NR", "VIS0001", gate.getGateName(), Integer.getInteger(userInput));
-                }
-                caseNumberTextField.setEnabled(true);
-            }
-        };
-
-        action.actionPerformed(evt);
+        TokenManagerService.printNewRegistrationTokenAction(gate.getGateName(), reportLocation, evt);
 
     }//GEN-LAST:event_printTokenButton1ActionPerformed
+
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
         try {
@@ -744,16 +680,20 @@ public final class TokenPrintingTopComponent extends TopComponent {
     }//GEN-LAST:event_todayButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        NotifyDescriptor nd = new NotifyDescriptor.Confirmation("Do you want to inactivate this token?", "Inactivation confirmation", NotifyDescriptor.YES_NO_OPTION);
+        Object result = DialogDisplayer.getDefault().notify(nd);
+        if (result != NotifyDescriptor.OK_OPTION) {
+            return;
+        }
         try {
             Connection con = EntityManagerSingleton.getDefault().getConnectionForproGres();
             int selectedRow = tokenTable.getSelectedRow();
-            String updateSQL = "UPDATE    tmp_TokenReport\n"
+            String updateSQL = "UPDATE tmp_TokenReport\n"
                     + "SET      TokenStatus = N'X'\n"
                     + "WHERE     (TokenDistributedGUID = ?)";
 
             HashMap<Integer, Object> map = new HashMap<>();
             String tokenGUID = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0);
-
             map.put(1, tokenGUID);
             tokenTableModel.executePreparedQuery(con, updateSQL, map);
             tokenTableModel.getAllToken(EntityManagerSingleton.getDefault().getConnectionForproGres());
@@ -773,16 +713,8 @@ public final class TokenPrintingTopComponent extends TopComponent {
                 final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5);
                 final String reason = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 11);
                 final String gate = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 13);
-                if (VisitCategoryController.checkDuplicateToken(reason, caseNumber, gate, null)) {
-                    int option = JOptionPane.showConfirmDialog(printTokenButton, "Token Already Printed\nDo you want to reprint it?", "Duplicate Token", JOptionPane.YES_NO_OPTION);
-                    if (option == JOptionPane.OK_OPTION) {
-                        effectivePrintToken(caseNumber, reason, gate);
-                    }
-                } else {
-                    effectivePrintToken(caseNumber, reason, gate);
-                }
+                TokenManagerService.printTokenAction(reason, caseNumber, gate, reportLocation);
             }
-
         };
         action.actionPerformed(evt);
 
@@ -827,21 +759,27 @@ public final class TokenPrintingTopComponent extends TopComponent {
             @Override
             protected void mainAction() {
                 int selectedRow = tokenTable.getSelectedRow();
-                System.out.println("tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5) " + tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5));
-                System.out.println("tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0) " + tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0));
-
                 final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5);
                 final String tokenGUID = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0);
-                effectivePreviewToken(tokenGUID, caseNumber);
+                TokenManagerService.effectivePreviewToken(tokenGUID, caseNumber, reportLocation);
             }
-
         };
         action.actionPerformed(evt);
     }//GEN-LAST:event_previewButtonActionPerformed
 
     private void reloadChartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadChartButtonActionPerformed
         try {
-            arrivalChart.getFreshData();
+            TokenDateFilter form = new TokenDateFilter();
+            String msg = "Date Filtration for Arrival Chart";
+            DialogDescriptor dd = new DialogDescriptor(form, msg);
+            Object result = DialogDisplayer.getDefault().notify(dd);
+            if (result == NotifyDescriptor.OK_OPTION) {
+                if (form.getStartDate() != null && form.getEndDate() != null) {
+                    arrivalChart.getFreshData(form.getStartDate(), form.getEndDate());
+                } else {
+                    arrivalChart.getFreshData();
+                }
+            }
             categoryButtonGroup.clearSelection();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
@@ -858,41 +796,15 @@ public final class TokenPrintingTopComponent extends TopComponent {
 
     }//GEN-LAST:event_cumulativeToggleButtonActionPerformed
 
-    private void registerComplainsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerComplainsButtonActionPerformed
-        String txt = "Number Of Individuals: ";
-        String title = "Number of people Inquiring";
 
-        NotifyDescriptor.InputLine input = new NotifyDescriptor.InputLine(txt, title);
-        input.setInputText("1"); // specify a default name
-        Object result = DialogDisplayer.getDefault().notify(input);
-        if (result != NotifyDescriptor.OK_OPTION) {
-            return;
-        }
-        String userInput = input.getInputText();
-        if (!userInput.matches("\\d+")) {
-            return;
-        }
+    private void registerComplainsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerComplainsButtonActionPerformed
         final String caseNumber = caseNumberTextField.getText();
         final VisitReason reason = (VisitReason) reasonComboBox.getSelectedItem();
         final Gate gate = (Gate) gateComboBox.getSelectedItem();
-
-        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
-            try {
-                TokenDetails details = TokenManagerService.addToken(caseNumber, reason.getReasonCode(), gate.getGateName(), Integer.parseInt(userInput));
-
-                ComplainToken form = new ComplainToken(details);
-                String msg = "Service Request Added Successfully";
-                DialogDescriptor dd = new DialogDescriptor(form, msg);
-                DialogDisplayer.getDefault().notify(dd);
-            } catch (SQLException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        } else {
-            NotifyDescriptor.Message message = new NotifyDescriptor.Message("Case Number not present in proGres\nPlease check again", NotifyDescriptor.ERROR_MESSAGE);
-            DialogDisplayer.getDefault().notify(message);
-        }
+        TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(), gate.getGateName());
 
     }//GEN-LAST:event_registerComplainsButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -912,7 +824,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -935,6 +846,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private javax.swing.JToolBar jToolBar3;
     private javax.swing.JButton loadButton;
     private org.jdesktop.swingx.JXHeader mainHeader;
+    private javax.swing.JLabel photoLabel;
     private javax.swing.JButton previewButton;
     private javax.swing.JButton printAgainButton;
     private javax.swing.JButton printTokenButton;

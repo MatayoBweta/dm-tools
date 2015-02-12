@@ -82,6 +82,22 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.unhcr.eg.data.management.tool.controlfx</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.unhcr.eg.data.management.tool.jsoup</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.unhcr.eg.data.tool.gson</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>

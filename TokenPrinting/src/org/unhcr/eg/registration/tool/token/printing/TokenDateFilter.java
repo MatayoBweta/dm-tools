@@ -5,11 +5,21 @@
  */
 package org.unhcr.eg.registration.tool.token.printing;
 
+import java.util.Date;
+
 /**
  *
  * @author UNHCRuser
  */
 public class TokenDateFilter extends javax.swing.JPanel {
+
+    public Date getStartDate() {
+        return startXDatePicker.getDate();
+    }
+
+    public Date getEndDate() {
+        return endXDatePicker.getDate();
+    }
 
     /**
      * Creates new form TokenDateFilter
@@ -27,19 +37,50 @@ public class TokenDateFilter extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        startXDatePicker = new org.jdesktop.swingx.JXDatePicker();
+        endXDatePicker = new org.jdesktop.swingx.JXDatePicker();
+        startDateLabel = new javax.swing.JLabel();
+        endDateLabel = new javax.swing.JLabel();
+
+        org.openide.awt.Mnemonics.setLocalizedText(startDateLabel, org.openide.util.NbBundle.getMessage(TokenDateFilter.class, "TokenDateFilter.startDateLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(endDateLabel, org.openide.util.NbBundle.getMessage(TokenDateFilter.class, "TokenDateFilter.endDateLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 287, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(startDateLabel)
+                    .addComponent(endDateLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(endXDatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                    .addComponent(startXDatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 163, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(startXDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(startDateLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(endXDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(endDateLabel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel endDateLabel;
+    private org.jdesktop.swingx.JXDatePicker endXDatePicker;
+    private javax.swing.JLabel startDateLabel;
+    private org.jdesktop.swingx.JXDatePicker startXDatePicker;
     // End of variables declaration//GEN-END:variables
 }

@@ -45,18 +45,27 @@ public class ArrivalChart extends JFXPanel {
     private boolean ready;
 
     public ArrivalChart() throws Exception {
+
         startingDate = TokenManagerService.getMinReceptionDate();
         endDate = TokenManagerService.getMaxReceptionDate();
+    }
+
+    public void init() {
+        Platform.setImplicitExit(false);
         webview = new WebView();
         webview.setContextMenuEnabled(false);
         webview.getEngine().load(
                 ArrivalChart.class.getResource("/org/unhcr/eg/registration/tool/token/printing/chart/ArrivalChart.html").toExternalForm()
         );
         setScene(new Scene(webview));
-
     }
 
     public void getFreshData() throws SQLException {
+        accessTimeReports = TokenManagerService.getAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate), ClockManager.getSQLDate(lastLoadingDate));
+        getOfflineData(0);
+    }
+
+    public void getFreshData(Date startingDate, Date endDate) throws SQLException {
         accessTimeReports = TokenManagerService.getAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate), ClockManager.getSQLDate(lastLoadingDate));
         getOfflineData(0);
     }

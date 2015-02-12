@@ -83,13 +83,13 @@ public final class DatabaseCheckForm extends JPanel implements java.awt.event.Ac
             initComponents();
             save = new JButton("Save");
             save.setActionCommand("Save");
-  //         save.addActionListener(this);
+            //         save.addActionListener(this);
             cancel = new JButton("Cancel");
             cancel.setActionCommand("Cancel");
- //           cancel.addActionListener(this);
+            //           cancel.addActionListener(this);
             testConnection = new JButton("Test");
             testConnection.setActionCommand("Test");
- //           testConnection.addActionListener(this);
+            //           testConnection.addActionListener(this);
             getValue();
             centralPanel.setLayout(CustomMigLayout.PANEL_2COLUMN_LAYOUT);
             buildPanel(centralPanel);
@@ -106,7 +106,7 @@ public final class DatabaseCheckForm extends JPanel implements java.awt.event.Ac
                 }
             });
         } catch (NoSuchProviderException | BadPaddingException | InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | IllegalBlockSizeException ex) {
-           Exceptions.printStackTrace(ex);
+            Exceptions.printStackTrace(ex);
         } catch (GeneralSecurityException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -278,8 +278,11 @@ public final class DatabaseCheckForm extends JPanel implements java.awt.event.Ac
                         Exceptions.printStackTrace(ex);
                     }
                 } else {
-                    Exception ex = new Exception("Connection failed");
-                   Exceptions.printStackTrace(ex);
+                    try {
+                        throw new Exception("Connection failed");
+                    } catch (Exception ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
                 }
                 break;
             case "Cancel":
@@ -289,13 +292,15 @@ public final class DatabaseCheckForm extends JPanel implements java.awt.event.Ac
                 }
                 break;
             case "Test":
-                System.out.println("Test inside");
                 if (DatabaseUtility.pingDatabase(DatabaseUtility.getMSSQLDatabaseURL(getHostName(), getPort(), getDatabaseName()), getUserID(), new String(serverPasswordText.getPassword()))) {
                     NotifyDescriptor nd = new NotifyDescriptor.Message("Successfully Access to Database");
                     DialogDisplayer.getDefault().notify(nd);
                 } else {
-                    Exception ex = new Exception("Connection failed");
-                    Exceptions.printStackTrace(ex);
+                    try {
+                        throw new Exception("Connection failed");
+                    } catch (Exception ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
                 }
                 break;
         }
