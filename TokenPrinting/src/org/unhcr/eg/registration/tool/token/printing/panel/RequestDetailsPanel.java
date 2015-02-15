@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.unhcr.eg.registration.tool.token.printing;
+package org.unhcr.eg.registration.tool.token.printing.panel;
 
 import java.text.SimpleDateFormat;
 import org.unhcr.eg.registration.tool.token.printing.models.TokenDetails;
@@ -12,7 +12,7 @@ import org.unhcr.eg.registration.tool.token.printing.models.TokenDetails;
  *
  * @author UNHCRuser
  */
-public class ComplainToken extends javax.swing.JPanel {
+public class RequestDetailsPanel extends javax.swing.JPanel {
 
     private TokenDetails details;
     private final SimpleDateFormat sdf = new SimpleDateFormat(
@@ -21,7 +21,7 @@ public class ComplainToken extends javax.swing.JPanel {
     /**
      * Creates new form ComplainToken
      */
-    public ComplainToken(TokenDetails details) {
+    public RequestDetailsPanel(TokenDetails details) {
         this.details = details;
         initComponents();
         updatePanel(details);
@@ -86,13 +86,13 @@ public class ComplainToken extends javax.swing.JPanel {
         arrivalPanel.setLayout(new java.awt.BorderLayout());
 
         ArrivalDateAndTimeLabel_.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(ArrivalDateAndTimeLabel_, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.ArrivalDateAndTimeLabel_.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(ArrivalDateAndTimeLabel_, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.ArrivalDateAndTimeLabel_.text")); // NOI18N
         arrivalPanel.add(ArrivalDateAndTimeLabel_, java.awt.BorderLayout.NORTH);
 
         arrivalDateAndTimeLabel.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         arrivalDateAndTimeLabel.setForeground(new java.awt.Color(0, 102, 204));
         arrivalDateAndTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        org.openide.awt.Mnemonics.setLocalizedText(arrivalDateAndTimeLabel, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.arrivalDateAndTimeLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(arrivalDateAndTimeLabel, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.arrivalDateAndTimeLabel.text")); // NOI18N
         arrivalPanel.add(arrivalDateAndTimeLabel, java.awt.BorderLayout.CENTER);
 
         add(arrivalPanel, java.awt.BorderLayout.PAGE_START);
@@ -100,21 +100,21 @@ public class ComplainToken extends javax.swing.JPanel {
         centerPanel.setLayout(new java.awt.BorderLayout());
 
         TokenPanel.setBackground(new java.awt.Color(255, 255, 255));
-        TokenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.TokenPanel.border.title"))); // NOI18N
+        TokenPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.TokenPanel.border.title"))); // NOI18N
         TokenPanel.setLayout(new java.awt.GridLayout(1, 0));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         TokenNumberLabel_.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(TokenNumberLabel_, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.TokenNumberLabel_.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(TokenNumberLabel_, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.TokenNumberLabel_.text")); // NOI18N
         jPanel1.add(TokenNumberLabel_, java.awt.BorderLayout.NORTH);
 
         tokenNumberLabel_1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         tokenNumberLabel_1.setForeground(new java.awt.Color(0, 102, 204));
         tokenNumberLabel_1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         tokenNumberLabel_1.setLabelFor(TokenNumberLabel_);
-        org.openide.awt.Mnemonics.setLocalizedText(tokenNumberLabel_1, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.tokenNumberLabel_1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(tokenNumberLabel_1, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.tokenNumberLabel_1.text")); // NOI18N
         jPanel1.add(tokenNumberLabel_1, java.awt.BorderLayout.CENTER);
 
         TokenPanel.add(jPanel1);
@@ -123,13 +123,13 @@ public class ComplainToken extends javax.swing.JPanel {
         jPanel6.setLayout(new java.awt.BorderLayout());
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.jLabel2.text")); // NOI18N
         jPanel6.add(jLabel2, java.awt.BorderLayout.PAGE_START);
 
         visitNumberLabel_1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         visitNumberLabel_1.setForeground(new java.awt.Color(0, 102, 204));
         visitNumberLabel_1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        org.openide.awt.Mnemonics.setLocalizedText(visitNumberLabel_1, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.visitNumberLabel_1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(visitNumberLabel_1, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.visitNumberLabel_1.text")); // NOI18N
         jPanel6.add(visitNumberLabel_1, java.awt.BorderLayout.CENTER);
 
         TokenPanel.add(jPanel6);
@@ -137,25 +137,25 @@ public class ComplainToken extends javax.swing.JPanel {
         centerPanel.add(TokenPanel, java.awt.BorderLayout.CENTER);
 
         casePanel.setBackground(new java.awt.Color(255, 255, 255));
-        casePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.casePanel.border.title"))); // NOI18N
+        casePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.casePanel.border.title"))); // NOI18N
         casePanel.setLayout(new java.awt.GridLayout(1, 0));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.jLabel5.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.jLabel5.text")); // NOI18N
         casePanel.add(jLabel5);
 
         caseNumberLabel_1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         caseNumberLabel_1.setForeground(new java.awt.Color(0, 102, 204));
-        org.openide.awt.Mnemonics.setLocalizedText(caseNumberLabel_1, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.caseNumberLabel_1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(caseNumberLabel_1, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.caseNumberLabel_1.text")); // NOI18N
         casePanel.add(caseNumberLabel_1);
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.jLabel7.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.jLabel7.text")); // NOI18N
         casePanel.add(jLabel7);
 
         familySizeLabel_1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         familySizeLabel_1.setForeground(new java.awt.Color(0, 102, 204));
-        org.openide.awt.Mnemonics.setLocalizedText(familySizeLabel_1, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.familySizeLabel_1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(familySizeLabel_1, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.familySizeLabel_1.text")); // NOI18N
         casePanel.add(familySizeLabel_1);
 
         centerPanel.add(casePanel, java.awt.BorderLayout.PAGE_START);
@@ -163,7 +163,7 @@ public class ComplainToken extends javax.swing.JPanel {
         visitPanel.setLayout(new java.awt.GridBagLayout());
 
         locationLabel_.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(locationLabel_, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.locationLabel_.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(locationLabel_, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.locationLabel_.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 20;
@@ -171,13 +171,13 @@ public class ComplainToken extends javax.swing.JPanel {
         visitPanel.add(locationLabel_, gridBagConstraints);
 
         locationLabel_1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(locationLabel_1, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.locationLabel_1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(locationLabel_1, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.locationLabel_1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         visitPanel.add(locationLabel_1, gridBagConstraints);
 
         gateLabel_.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(gateLabel_, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.gateLabel_.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(gateLabel_, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.gateLabel_.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -187,7 +187,7 @@ public class ComplainToken extends javax.swing.JPanel {
         visitPanel.add(gateLabel_, gridBagConstraints);
 
         gateLabel_1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(gateLabel_1, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.gateLabel_1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(gateLabel_1, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.gateLabel_1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -195,7 +195,7 @@ public class ComplainToken extends javax.swing.JPanel {
         visitPanel.add(gateLabel_1, gridBagConstraints);
 
         visitReasonLabel_.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(visitReasonLabel_, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.visitReasonLabel_.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(visitReasonLabel_, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.visitReasonLabel_.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -205,7 +205,7 @@ public class ComplainToken extends javax.swing.JPanel {
         visitPanel.add(visitReasonLabel_, gridBagConstraints);
 
         visitReasonLabel_1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(visitReasonLabel_1, org.openide.util.NbBundle.getMessage(ComplainToken.class, "ComplainToken.visitReasonLabel_1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(visitReasonLabel_1, org.openide.util.NbBundle.getMessage(RequestDetailsPanel.class, "RequestDetailsPanel.visitReasonLabel_1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;

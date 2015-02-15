@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.unhcr.eg.registration.tool.token.printing;
+package org.unhcr.eg.registration.tool.token.printing.panel;
 
 import java.util.Date;
 

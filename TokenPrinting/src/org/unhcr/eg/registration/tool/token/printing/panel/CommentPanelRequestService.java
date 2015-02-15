@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.unhcr.eg.registration.tool.token.printing;
+package org.unhcr.eg.registration.tool.token.printing.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +42,7 @@ public class CommentPanelRequestService extends JFXPanel implements ActionListen
     public TextField getNumberOfIndividualText() {
         return numberOfIndividual;
     }
-    
+
     public HTMLEditor getHTMLEditor() {
         return comments;
     }
@@ -60,7 +60,6 @@ public class CommentPanelRequestService extends JFXPanel implements ActionListen
     }
 
     public CommentPanelRequestService() {
-
         ok = new JButton("Add Details");
         ok.setActionCommand("Ok");
         cancel = new JButton("Cancel");
@@ -71,6 +70,7 @@ public class CommentPanelRequestService extends JFXPanel implements ActionListen
     public void init() {
         Platform.setImplicitExit(false);
         GridPane grid = new GridPane();
+        
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
@@ -92,6 +92,7 @@ public class CommentPanelRequestService extends JFXPanel implements ActionListen
         grid.add(comments, 0, 4, 2, 1);
 
         setScene(new Scene(grid, 300, 300));
+       
     }
 
     public boolean isValidData() {

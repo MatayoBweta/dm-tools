@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxfxmltest.FXMLDocumentController">
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.unhcr.eg.registration.tool.token.printing.panel.TokenPrintingController">
    <children>
       <AnchorPane id="AnchorPane" prefHeight="340.0" prefWidth="320">
          <children>
@@ -17,10 +17,21 @@
             <Label layoutX="14.0" layoutY="64.0" text="Group Of Service" />
             <ComboBox fx:id="groupeOfServiceCombobox" layoutX="11.0" layoutY="81.0" prefHeight="25.0" prefWidth="297.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="12.0" />
             <ComboBox fx:id="serviceRequestCombobox" layoutX="8.0" layoutY="135.0" prefHeight="25.0" prefWidth="297.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="12.0" />
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
             <ComboBox fx:id="gateComboboX" layoutX="11.0" layoutY="186.0" prefHeight="25.0" prefWidth="297.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="12.0" />
             <Label layoutX="14.0" layoutY="118.0" text="Service Requested" />
             <Label layoutX="14.0" layoutY="169.0" text="Gate" />
-            <Button layoutX="273.0" layoutY="31.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="36.0" text="..." AnchorPane.rightAnchor="11.0" />
+            <Button fx:id="detailsButton" layoutX="273.0" layoutY="31.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="36.0" text="..." AnchorPane.rightAnchor="11.0" />
             <Label layoutX="13.0" layoutY="219.0" text="Phone Number" />
             <TextField fx:id="phoneNumber" layoutX="11.0" layoutY="236.0" prefHeight="25.0" prefWidth="297.0" />
          </children>
@@ -28,9 +39,9 @@
       <Region prefHeight="26.0" prefWidth="320.0" VBox.vgrow="ALWAYS" />
       <VBox prefHeight="124.0" prefWidth="320.0" spacing="10.0">
          <children>
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Request Service" />
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="New Registration" />
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Print Token For entrance" />
+            <Button fx:id="requestButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#registerQuery" text="Request Service" />
+            <Button fx:id="newRegistrationButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#printNewRegistrationToken" text="New Registration" />
+            <Button fx:id="printTokenButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#printOtherToken" text="Print Token For entrance" />
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

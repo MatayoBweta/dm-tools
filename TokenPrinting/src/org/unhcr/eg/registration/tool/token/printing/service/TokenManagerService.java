@@ -34,8 +34,8 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.unhcr.eg.registration.security.action.LongTaskBackgroundAction;
 import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
-import org.unhcr.eg.registration.tool.token.printing.CommentPanelRequestService;
-import org.unhcr.eg.registration.tool.token.printing.ComplainToken;
+import org.unhcr.eg.registration.tool.token.printing.panel.CommentPanelRequestService;
+import org.unhcr.eg.registration.tool.token.printing.panel.RequestDetailsPanel;
 import org.unhcr.eg.registration.tool.token.printing.TokenPrintingTopComponent;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
 import org.unhcr.eg.registration.tool.token.printing.models.CommentInput;
@@ -205,22 +205,11 @@ public class TokenManagerService {
         manager.previewPrinter("Preview the Token for Case " + caseNumber, "Token " + tokenGUID + " for Case " + caseNumber);
     }
 
-    public static boolean printTokenAction(final VisitReason reason, final String caseNumber, final Gate gate, String reportLocation) throws HeadlessException {
-        if (VisitCategoryController.checkDuplicateToken(reason.getReasonCode(), caseNumber, gate.getGateName())) {
-            int option = JOptionPane.showConfirmDialog(null, "Token Already Printed\nDo you want to reprint it?", "Duplicate Token", JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                return TokenManagerService.effectivePrintToken(caseNumber, reason.getReasonCode(), gate.getGateName(), 0, reportLocation);
-            }
-        } else {
-            return TokenManagerService.effectivePrintToken(caseNumber, reason.getReasonCode(), gate.getGateName(), 0, reportLocation);
-        }
-        return false;
-    }
-
     public static boolean printTokenAction(String reason, String caseNumber, String gate, String reportLocation) throws HeadlessException {
         if (VisitCategoryController.checkDuplicateToken(reason, caseNumber, gate)) {
-            int option = JOptionPane.showConfirmDialog(null, "Token Already Printed\nDo you want to reprint it?", "Duplicate Token", JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
+            NotifyDescriptor.Confirmation confirmation = new NotifyDescriptor.Confirmation("Token Already Printed\nDo you want to reprint it?", "Duplicate Token", NotifyDescriptor.YES_NO_OPTION);
+            Object option = DialogDisplayer.getDefault().notify(confirmation);
+            if (option == NotifyDescriptor.OK_OPTION) {
                 return TokenManagerService.effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
             }
         } else {
@@ -256,40 +245,43 @@ public class TokenManagerService {
         manager.print();
     }
 
-    public static boolean printNewRegistrationTokenAction(String gate, String reportLocation, ActionEvent evt) {
+    public static boolean printNewRegistrationTokenAction(String gate, String reportLocation) {
         String defaultData = "<html><body contentEditable=\"true\">New Registration</body></html>";
-
         final CommentInput input = getUserInput("Number of New Registration Requester", defaultData);
         LongTaskBackgroundAction action;
-        action = new LongTaskBackgroundAction("Print New Token") {
-            @Override
-            protected void mainAction() {
-                int option = JOptionPane.showConfirmDialog(null, "Do you want to print Token for new family?", "New Registration", JOptionPane.YES_NO_OPTION);
-                if (option == JOptionPane.OK_OPTION) {
-                    TokenManagerService.effectivePrintToken("NR", "VIS0001", gate, input.getCount(), reportLocation);
+        NotifyDescriptor.Confirmation confirmPrinting = new NotifyDescriptor.Confirmation("Do you want to print Token for new family?", "New Registration", NotifyDescriptor.YES_NO_OPTION);
+        Object resultConfirmation = DialogDisplayer.getDefault().notify(confirmPrinting);
+        if (resultConfirmation == NotifyDescriptor.OK_OPTION) {
+            action = new LongTaskBackgroundAction("Print New Token") {
+                @Override
+                protected void mainAction() {
+                    effectivePrintToken("NR", "VIS0001", gate, input.getCount(), reportLocation);
                 }
-            }
-        };
-        action.actionPerformed(evt);
-        return true;
+            };
+            action.actionPerformed(null);
+            return true;
+        }
+        return false;
     }
 
     public static CommentInput getUserInput(String inputTitle, String defaultData) {
+
         CommentPanelRequestService commentPanelRequestService = new CommentPanelRequestService();
-        Platform.runLater(() -> {
-            commentPanelRequestService.init();
-            if (defaultData != null) {
-                commentPanelRequestService.getHTMLEditor().setHtmlText(defaultData);
-            }
-        });
-        JPanel customPanel = new JPanel();
-        customPanel.setPreferredSize(new Dimension(400, 300));
-        customPanel.setLayout(new BorderLayout());
-        customPanel.add(commentPanelRequestService, BorderLayout.CENTER);
-        DialogDescriptor input = new DialogDescriptor(customPanel, inputTitle, true, commentPanelRequestService);
+        commentPanelRequestService.init();
+        if (defaultData != null) {
+            commentPanelRequestService.getHTMLEditor().setHtmlText(defaultData);
+        }
+//        Platform.runLater(() -> {
+//            
+//        });
+//        JPanel customPanel = new JPanel();
+//        customPanel.setPreferredSize(new Dimension(400, 300));
+//        customPanel.setLayout(new BorderLayout());
+//        customPanel.add(commentPanelRequestService, BorderLayout.CENTER);
+//        customPanel.repaint();
+        DialogDescriptor input = new DialogDescriptor(commentPanelRequestService, inputTitle, true, commentPanelRequestService);
         input.setOptions(new Object[]{commentPanelRequestService.getOk(), commentPanelRequestService.getCancel()});
         input.setClosingOptions(new Object[]{});
-        int i = 0;
         input.addPropertyChangeListener((PropertyChangeEvent evt1) -> {
             if ("value".equalsIgnoreCase(evt1.getPropertyName())) {
                 // Escape pressed or dialog closed...
@@ -321,7 +313,7 @@ public class TokenManagerService {
             if (VisitCategoryController.checkCaseNumber(caseNumber)) {
                 try {
                     TokenDetails details = TokenManagerService.addToken(caseNumber, reasonCode, gateCode, input.getCount(), input.getComments());
-                    ComplainToken form = new ComplainToken(details);
+                    RequestDetailsPanel form = new RequestDetailsPanel(details);
                     String msg = "Service Request Added Successfully";
                     DialogDescriptor dd = new DialogDescriptor(form, msg);
                     DialogDisplayer.getDefault().notify(dd);
