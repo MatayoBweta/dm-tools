@@ -154,7 +154,6 @@ public class CommentPopOver {
 
         root.getChildren().add(buttons);
         popOver.setContent(root);
-
     }
 
     public boolean isValidData() {

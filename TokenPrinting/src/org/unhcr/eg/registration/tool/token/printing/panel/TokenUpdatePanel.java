@@ -24,6 +24,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.awt.Notification;
 import org.unhcr.eg.registration.tool.token.printing.models.Gate;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitCategory;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitReason;
@@ -220,25 +224,33 @@ public class TokenUpdatePanel extends JFXPanel {
     }
 
     private void registerQuery(ActionEvent event) {
-
-        commentPopOver.getPopOver().show();
-
-//        final String caseNumber = caseNumberText.getText();
-//        final VisitReason reason = (VisitReason) serviceRequestedCombobox.getSelectionModel().getSelectedItem();
-//        final Gate gate = (Gate) gateCombobox.getSelectionModel().getSelectedItem();
-//        TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(), gate.getGateName());
+        final String caseNumber = caseNumberText.getText();
+        final VisitReason reason = (VisitReason) serviceRequestedCombobox.getSelectionModel().getSelectedItem();
+        final Gate gate = (Gate) gateCombobox.getSelectionModel().getSelectedItem();
+        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+            TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(), gate.getGateName());
+        } else {
+            NotifyDescriptor.Message m = new NotifyDescriptor.Message("Case Number Not existing in proGres", NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(m);
+        }
     }
 
     private void printNewRegistrationToken(ActionEvent event) {
+        //       commentPopOver.getPopOver().show();
         final Gate gate = (Gate) gateCombobox.getSelectionModel().getSelectedItem();
         TokenManagerService.printNewRegistrationTokenAction(gate.getGateName(), reportLocation);
     }
 
     private void printOtherToken(ActionEvent event) {
+//         commentPopOver.getPopOver().show();
         final String caseNumber = caseNumberText.getText();
         final VisitReason reason = (VisitReason) serviceRequestedCombobox.getSelectionModel().getSelectedItem();
         final Gate gate = (Gate) gateCombobox.getSelectionModel().getSelectedItem();
-        TokenManagerService.printTokenAction(reason.getReasonCode(), caseNumber, gate.getGateName(), reportLocation);
+        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+            TokenManagerService.printTokenAction(reason.getReasonCode(), caseNumber, gate.getGateName(), reportLocation);
+        } else {
+            NotifyDescriptor.Message m = new NotifyDescriptor.Message("Case Number Not existing in proGres", NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(m);
+        }
     }
-
 }

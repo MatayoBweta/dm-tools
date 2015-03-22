@@ -5,10 +5,7 @@
  */
 package org.unhcr.eg.registration.tool.token.printing.service;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.HeadlessException;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -24,9 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
-import javafx.application.Platform;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import net.sf.jasperreports.engine.JRException;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -34,14 +28,11 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.unhcr.eg.registration.security.action.LongTaskBackgroundAction;
 import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
-import org.unhcr.eg.registration.tool.token.printing.panel.CommentPanelRequestService;
 import org.unhcr.eg.registration.tool.token.printing.panel.RequestDetailsPanel;
-import org.unhcr.eg.registration.tool.token.printing.TokenPrintingTopComponent;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
 import org.unhcr.eg.registration.tool.token.printing.models.CommentInput;
-import org.unhcr.eg.registration.tool.token.printing.models.Gate;
 import org.unhcr.eg.registration.tool.token.printing.models.TokenDetails;
-import org.unhcr.eg.registration.tool.token.printing.models.VisitReason;
+import org.unhcr.eg.registration.tool.token.printing.panel.CommentPanel;
 
 /**
  *
@@ -210,10 +201,10 @@ public class TokenManagerService {
             NotifyDescriptor.Confirmation confirmation = new NotifyDescriptor.Confirmation("Token Already Printed\nDo you want to reprint it?", "Duplicate Token", NotifyDescriptor.YES_NO_OPTION);
             Object option = DialogDisplayer.getDefault().notify(confirmation);
             if (option == NotifyDescriptor.OK_OPTION) {
-                return TokenManagerService.effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
+                return effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
             }
         } else {
-            return TokenManagerService.effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
+            return effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
         }
         return false;
     }
@@ -248,37 +239,32 @@ public class TokenManagerService {
     public static boolean printNewRegistrationTokenAction(String gate, String reportLocation) {
         String defaultData = "<html><body contentEditable=\"true\">New Registration</body></html>";
         final CommentInput input = getUserInput("Number of New Registration Requester", defaultData);
-        LongTaskBackgroundAction action;
-        NotifyDescriptor.Confirmation confirmPrinting = new NotifyDescriptor.Confirmation("Do you want to print Token for new family?", "New Registration", NotifyDescriptor.YES_NO_OPTION);
-        Object resultConfirmation = DialogDisplayer.getDefault().notify(confirmPrinting);
-        if (resultConfirmation == NotifyDescriptor.OK_OPTION) {
-            action = new LongTaskBackgroundAction("Print New Token") {
-                @Override
-                protected void mainAction() {
-                    effectivePrintToken("NR", "VIS0001", gate, input.getCount(), reportLocation);
-                }
-            };
-            action.actionPerformed(null);
-            return true;
+        if (input != null) {
+            LongTaskBackgroundAction action;
+            NotifyDescriptor.Confirmation confirmPrinting = new NotifyDescriptor.Confirmation("Do you want to print Token for new family?", "New Registration", NotifyDescriptor.YES_NO_OPTION);
+            Object resultConfirmation = DialogDisplayer.getDefault().notify(confirmPrinting);
+            System.out.println("resultConfirmation " + resultConfirmation);
+            if (resultConfirmation == NotifyDescriptor.YES_OPTION) {
+                System.out.println("Print New Token " + resultConfirmation);
+                action = new LongTaskBackgroundAction("Print New Token") {
+                    @Override
+                    protected void mainAction() {
+                        effectivePrintToken("NR", "VIS0001", gate, input.getCount(), reportLocation);
+                    }
+                };
+                action.actionPerformed(null);
+                return true;
+            }
+        } else {
+            NotifyDescriptor.Message m = new NotifyDescriptor.Message("Input was not entered", NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(m);
         }
         return false;
     }
 
     public static CommentInput getUserInput(String inputTitle, String defaultData) {
 
-        CommentPanelRequestService commentPanelRequestService = new CommentPanelRequestService();
-        commentPanelRequestService.init();
-        if (defaultData != null) {
-            commentPanelRequestService.getHTMLEditor().setHtmlText(defaultData);
-        }
-//        Platform.runLater(() -> {
-//            
-//        });
-//        JPanel customPanel = new JPanel();
-//        customPanel.setPreferredSize(new Dimension(400, 300));
-//        customPanel.setLayout(new BorderLayout());
-//        customPanel.add(commentPanelRequestService, BorderLayout.CENTER);
-//        customPanel.repaint();
+        CommentPanel commentPanelRequestService = new CommentPanel();
         DialogDescriptor input = new DialogDescriptor(commentPanelRequestService, inputTitle, true, commentPanelRequestService);
         input.setOptions(new Object[]{commentPanelRequestService.getOk(), commentPanelRequestService.getCancel()});
         input.setClosingOptions(new Object[]{});
@@ -298,7 +284,7 @@ public class TokenManagerService {
             return null;
         }
         String userInput = commentPanelRequestService.getNumberOfIndividuals();
-        String comments = commentPanelRequestService.getHTMLComments();
+        String comments = commentPanelRequestService.getComments();
 
         if (!userInput.matches("\\d+")) {
             return null;
