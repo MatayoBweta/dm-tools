@@ -243,9 +243,7 @@ public class TokenManagerService {
             LongTaskBackgroundAction action;
             NotifyDescriptor.Confirmation confirmPrinting = new NotifyDescriptor.Confirmation("Do you want to print Token for new family?", "New Registration", NotifyDescriptor.YES_NO_OPTION);
             Object resultConfirmation = DialogDisplayer.getDefault().notify(confirmPrinting);
-            System.out.println("resultConfirmation " + resultConfirmation);
             if (resultConfirmation == NotifyDescriptor.YES_OPTION) {
-                System.out.println("Print New Token for " + input.getCount());
                 action = new LongTaskBackgroundAction("Print New Token") {
                     @Override
                     protected void mainAction() {
