@@ -29,12 +29,16 @@ public class CommentPanel extends javax.swing.JPanel implements ActionListener {
     /**
      * Creates new form CommentPanel
      */
-    public CommentPanel() {
+    public CommentPanel(String comment, int numberOfIndividual, boolean numberVIsible) {
         initComponents();
         ok = new JButton("Add Details");
         ok.setActionCommand("Ok");
         cancel = new JButton("Cancel");
         cancel.setActionCommand("Cancel");
+        commentsTextArea.setText(comment);
+        numberOfIndividualsTextField.setText(Integer.toString(numberOfIndividual));
+        numberOfIndividualsTextField.setVisible(numberVIsible);
+        numberOfIndividualLabel.setVisible(numberVIsible);
     }
 
     public boolean isValidData() {
@@ -67,13 +71,13 @@ public class CommentPanel extends javax.swing.JPanel implements ActionListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        numberOfIndividualLabel = new javax.swing.JLabel();
         numberOfIndividualsTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         commentsTextArea = new javax.swing.JTextArea();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CommentPanel.class, "CommentPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(numberOfIndividualLabel, org.openide.util.NbBundle.getMessage(CommentPanel.class, "CommentPanel.numberOfIndividualLabel.text")); // NOI18N
 
         numberOfIndividualsTextField.setText(org.openide.util.NbBundle.getMessage(CommentPanel.class, "CommentPanel.numberOfIndividualsTextField.text")); // NOI18N
 
@@ -93,7 +97,7 @@ public class CommentPanel extends javax.swing.JPanel implements ActionListener {
                     .addComponent(numberOfIndividualsTextField)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
+                            .addComponent(numberOfIndividualLabel)
                             .addComponent(jLabel2))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
@@ -103,7 +107,7 @@ public class CommentPanel extends javax.swing.JPanel implements ActionListener {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(numberOfIndividualLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(numberOfIndividualsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -117,9 +121,9 @@ public class CommentPanel extends javax.swing.JPanel implements ActionListener {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea commentsTextArea;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel numberOfIndividualLabel;
     private javax.swing.JTextField numberOfIndividualsTextField;
     // End of variables declaration//GEN-END:variables
 

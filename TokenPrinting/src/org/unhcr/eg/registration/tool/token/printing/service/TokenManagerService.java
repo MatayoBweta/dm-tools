@@ -200,7 +200,7 @@ public class TokenManagerService {
         if (VisitCategoryController.checkDuplicateToken(reason, caseNumber, gate)) {
             NotifyDescriptor.Confirmation confirmation = new NotifyDescriptor.Confirmation("Token Already Printed\nDo you want to reprint it?", "Duplicate Token", NotifyDescriptor.YES_NO_OPTION);
             Object option = DialogDisplayer.getDefault().notify(confirmation);
-            if (option == NotifyDescriptor.OK_OPTION) {
+            if (option == NotifyDescriptor.YES_OPTION) {
                 return effectivePrintToken(caseNumber, reason, gate, 0, reportLocation);
             }
         } else {
@@ -216,7 +216,7 @@ public class TokenManagerService {
             } catch (JRException | FileNotFoundException ex) {
                 Exceptions.printStackTrace(ex);
             }
-        } else if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+        } else if (VisitCategoryController.checkCaseNumber(caseNumber) > -1) {
             try {
                 fillAndPrintToken(reportLocation, caseNumber, reason, gate, 0);
             } catch (JRException | FileNotFoundException ex) {
@@ -232,20 +232,20 @@ public class TokenManagerService {
         manager.setParameter("Case_Number", caseNumber);
         manager.setParameter("Visit_Reason", reason);
         manager.setParameter("Gate_Name", gate);
-        manager.setParameter("New_Individuals", numberOfIndividuals);
+        manager.setParameter("Number_Individual", numberOfIndividuals);
         manager.print();
     }
 
     public static boolean printNewRegistrationTokenAction(String gate, String reportLocation) {
-        String defaultData = "<html><body contentEditable=\"true\">New Registration</body></html>";
-        final CommentInput input = getUserInput("Number of New Registration Requester", defaultData);
+        String defaultData = "New Registration";
+        final CommentInput input = getUserInput("Number of New Registration Requester", defaultData, 1, true);
         if (input != null) {
             LongTaskBackgroundAction action;
             NotifyDescriptor.Confirmation confirmPrinting = new NotifyDescriptor.Confirmation("Do you want to print Token for new family?", "New Registration", NotifyDescriptor.YES_NO_OPTION);
             Object resultConfirmation = DialogDisplayer.getDefault().notify(confirmPrinting);
             System.out.println("resultConfirmation " + resultConfirmation);
             if (resultConfirmation == NotifyDescriptor.YES_OPTION) {
-                System.out.println("Print New Token " + resultConfirmation);
+                System.out.println("Print New Token for " + input.getCount());
                 action = new LongTaskBackgroundAction("Print New Token") {
                     @Override
                     protected void mainAction() {
@@ -262,9 +262,8 @@ public class TokenManagerService {
         return false;
     }
 
-    public static CommentInput getUserInput(String inputTitle, String defaultData) {
-
-        CommentPanel commentPanelRequestService = new CommentPanel();
+    public static CommentInput getUserInput(String inputTitle, String defaultData, int numberOfIndividual, boolean numberVIsible) {
+        CommentPanel commentPanelRequestService = new CommentPanel(defaultData, numberOfIndividual, numberVIsible);
         DialogDescriptor input = new DialogDescriptor(commentPanelRequestService, inputTitle, true, commentPanelRequestService);
         input.setOptions(new Object[]{commentPanelRequestService.getOk(), commentPanelRequestService.getCancel()});
         input.setClosingOptions(new Object[]{});
@@ -293,10 +292,11 @@ public class TokenManagerService {
         return commentInput;
     }
 
-    public static void registerServiceRequestAction(String caseNumber, String reasonCode, String gateCode) {
-        CommentInput input = getUserInput("Service Request Details", null);
-        if (input != null) {
-            if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+    public static void registerServiceRequestAction(String caseNumber, String reasonCode, String reasonText, String gateCode) {
+        int numberOfIndividual = VisitCategoryController.checkCaseNumber(caseNumber);
+        if (numberOfIndividual > -1) {
+            CommentInput input = getUserInput("Service Request Details", reasonText, numberOfIndividual, true);
+            if (input != null) {
                 try {
                     TokenDetails details = TokenManagerService.addToken(caseNumber, reasonCode, gateCode, input.getCount(), input.getComments());
                     RequestDetailsPanel form = new RequestDetailsPanel(details);
@@ -306,10 +306,11 @@ public class TokenManagerService {
                 } catch (SQLException ex) {
                     Exceptions.printStackTrace(ex);
                 }
-            } else {
-                NotifyDescriptor.Message message = new NotifyDescriptor.Message("Case Number not present in proGres\nPlease check again", NotifyDescriptor.ERROR_MESSAGE);
-                DialogDisplayer.getDefault().notify(message);
             }
+        } else {
+            NotifyDescriptor.Message message = new NotifyDescriptor.Message("Case Number not present in proGres\nPlease check again", NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(message);
+
         }
     }
 

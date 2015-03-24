@@ -87,19 +87,24 @@ public class VisitCategoryController {
         return vistiReason;
     }
 
-    public static boolean checkCaseNumber(String caseNumber) {
+    public static int checkCaseNumber(String caseNumber) {
         try {
             Connection connection = EntityManagerSingleton.getDefault().getConnection();
-            String getCategory = "SELECT DISTINCT ProcessingGroupNumber FROM dbo.dataProcessGroup WHERE ProcessingGroupNumber = ? ";
+            String getCategory = "SELECT DISTINCT ProcessingGroupSize FROM dbo.dataProcessGroup WHERE ProcessingGroupNumber = ? ";
             PreparedStatement statement = connection.prepareStatement(getCategory);
             statement.setString(1, caseNumber);
+            int numberOfIndividual = -1;
             ResultSet rs = statement.executeQuery();
-            return rs.next();
+            while (rs.next()) {
+                numberOfIndividual = rs.getInt("ProcessingGroupSize");
+                
+            }
+            return numberOfIndividual;
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
         }
 
-        return false;
+        return -1;
     }
 
     public static boolean checkDuplicateToken(String visitReason, String caseNumber, String gate) {
@@ -110,7 +115,6 @@ public class VisitCategoryController {
             statement.setString(1, visitReason);
             statement.setString(2, caseNumber);
             statement.setString(3, gate);
-
             ResultSet rs = statement.executeQuery();
             return rs.next();
         } catch (SQLException ex) {

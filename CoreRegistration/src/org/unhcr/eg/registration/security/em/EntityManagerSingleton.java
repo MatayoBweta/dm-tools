@@ -38,6 +38,6 @@ public abstract class EntityManagerSingleton {
     public abstract Connection getConnection();
 
     public abstract Connection getConnectionForproGres();
-    
-   public abstract Connection getConnectionForScheduler();
+
+    public abstract Connection getConnectionForScheduler();
 }

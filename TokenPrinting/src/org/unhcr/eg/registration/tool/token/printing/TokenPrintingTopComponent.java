@@ -35,9 +35,6 @@ import org.unhcr.eg.registration.security.action.LongTaskBackgroundAction;
 import org.unhcr.eg.registration.security.em.EntityManagerSingleton;
 import org.unhcr.eg.registration.security.exchange.ExcelSaver;
 import org.unhcr.eg.registration.tool.token.printing.chart.ArrivalChart;
-import org.unhcr.eg.registration.tool.token.printing.models.Gate;
-import org.unhcr.eg.registration.tool.token.printing.models.VisitCategory;
-import org.unhcr.eg.registration.tool.token.printing.models.VisitReason;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenManagerService;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenSummaryTableModel;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenTableModel;
@@ -109,7 +106,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         setToolTipText(Bundle.HINT_TokenPrintingTopComponent());
         tokenTableModel = new TokenTableModel();
         tokenSummaryTableModel = new TokenSummaryTableModel();
-        caseNumberTextField.requestFocusInWindow();
         tokenTable.addHighlighter(HighlighterFactory.createAlternateStriping(new Color(234, 234, 234), Color.WHITE));
         tokenTable.setModel(tokenTableModel);
 
@@ -140,18 +136,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         gates = ObservableCollections.observableList(VisitCategoryController.getGateList())
         ;
         categoryButtonGroup = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        caseNumberTextField = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        categoryComboBox = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
-        reasonComboBox = new javax.swing.JComboBox();
-        printTokenButton = new javax.swing.JButton();
-        printTokenButton1 = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
-        gateComboBox = new javax.swing.JComboBox();
-        registerComplainsButton = new javax.swing.JButton();
         mainHeader = new org.jdesktop.swingx.JXHeader();
         jPanel9 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
@@ -190,120 +174,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
         jButton3 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         summaryXTable = new org.jdesktop.swingx.JXTable();
-
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel1.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel1.text")); // NOI18N
-
-        caseNumberTextField.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        caseNumberTextField.setText(org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.caseNumberTextField.text")); // NOI18N
-
-        jLabel2.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel2.text")); // NOI18N
-
-        categoryComboBox.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-
-        org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, visitCategories, categoryComboBox);
-        bindingGroup.addBinding(jComboBoxBinding);
-
-        categoryComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                categoryComboBoxActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel3.text")); // NOI18N
-
-        reasonComboBox.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-
-        jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, visitReasons, reasonComboBox);
-        bindingGroup.addBinding(jComboBoxBinding);
-
-        printTokenButton.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        printTokenButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/printer-16.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(printTokenButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.printTokenButton.text")); // NOI18N
-        printTokenButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                printTokenButtonActionPerformed(evt);
-            }
-        });
-
-        printTokenButton1.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        printTokenButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/printer-16.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(printTokenButton1, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.printTokenButton1.text")); // NOI18N
-        printTokenButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                printTokenButton1ActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.jLabel5.text")); // NOI18N
-
-        gateComboBox.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-
-        jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, gates, gateComboBox);
-        bindingGroup.addBinding(jComboBoxBinding);
-
-        registerComplainsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/unhcr/eg/registration/tool/token/printing/1423433647_Male-User-Help.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(registerComplainsButton, org.openide.util.NbBundle.getMessage(TokenPrintingTopComponent.class, "TokenPrintingTopComponent.registerComplainsButton.text")); // NOI18N
-        registerComplainsButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                registerComplainsButtonActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(printTokenButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(gateComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel5)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel1)
-                            .addComponent(caseNumberTextField, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2)
-                            .addComponent(categoryComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(reasonComboBox, 0, 246, Short.MAX_VALUE)))
-                    .addComponent(printTokenButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(registerComplainsButton, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(caseNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addGap(4, 4, 4)
-                .addComponent(categoryComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(reasonComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(gateComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(registerComplainsButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(printTokenButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(printTokenButton)
-                .addContainerGap())
-        );
 
         setLayout(new java.awt.BorderLayout());
 
@@ -610,42 +480,10 @@ public final class TokenPrintingTopComponent extends TopComponent {
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void categoryComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_categoryComboBoxActionPerformed
-        VisitCategory category = (VisitCategory) categoryComboBox.getSelectedItem();
-        if (category != null) {
-            visitReasons.clear();
-            visitReasons.addAll(VisitCategoryController.getReasonList(category.getSectionCode()));
-        }
-
-    }//GEN-LAST:event_categoryComboBoxActionPerformed
-
-    private void printTokenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printTokenButtonActionPerformed
-        LongTaskBackgroundAction action = new LongTaskBackgroundAction("Print Token for " + caseNumberTextField.getText()) {
-
-            @Override
-            protected void mainAction() {
-                final String caseNumber = caseNumberTextField.getText();
-                final VisitReason reason = (VisitReason) reasonComboBox.getSelectedItem();
-                final Gate gate = (Gate) gateComboBox.getSelectedItem();
-                TokenManagerService.printTokenAction(reason.getReasonCode(), caseNumber, gate.getGateName(), reportLocation);
-            }
-
-        };
-        action.actionPerformed(evt);
-
-    }//GEN-LAST:event_printTokenButtonActionPerformed
-
-
-    private void printTokenButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printTokenButton1ActionPerformed
-        final Gate gate = (Gate) gateComboBox.getSelectedItem();
-        TokenManagerService.printNewRegistrationTokenAction(gate.getGateName(), reportLocation);
-
-    }//GEN-LAST:event_printTokenButton1ActionPerformed
-
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
         try {
-            tokenTableModel.getAllToken(EntityManagerSingleton.getDefault().getConnectionForproGres());
+            tokenTableModel.getAllToken(EntityManagerSingleton.getDefault().getConnection());
             adaptTable();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
@@ -669,7 +507,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
 
     private void todayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_todayButtonActionPerformed
         try {
-            tokenTableModel.getTodayToken(EntityManagerSingleton.getDefault().getConnectionForproGres());
+            tokenTableModel.getTodayToken(EntityManagerSingleton.getDefault().getConnection());
             adaptTable();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
@@ -683,7 +521,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
             return;
         }
         try {
-            Connection con = EntityManagerSingleton.getDefault().getConnectionForproGres();
+            Connection con = EntityManagerSingleton.getDefault().getConnection();
             int selectedRow = tokenTable.getSelectedRow();
             String updateSQL = "UPDATE tmp_TokenReport\n"
                     + "SET      TokenStatus = N'X'\n"
@@ -702,14 +540,16 @@ public final class TokenPrintingTopComponent extends TopComponent {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void printAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printAgainButtonActionPerformed
-        LongTaskBackgroundAction action = new LongTaskBackgroundAction("Print Token for " + caseNumberTextField.getText()) {
+
+        int selectedRow = tokenTable.getSelectedRow();
+        final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5);
+        final String reason = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 11);
+        final String gate = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 13);
+        LongTaskBackgroundAction action = new LongTaskBackgroundAction("Print Token for " + caseNumber) {
 
             @Override
             protected void mainAction() {
-                int selectedRow = tokenTable.getSelectedRow();
-                final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5);
-                final String reason = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 11);
-                final String gate = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 13);
+
                 TokenManagerService.printTokenAction(reason, caseNumber, gate, reportLocation);
             }
         };
@@ -727,7 +567,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            tokenSummaryTableModel.getAllToken(EntityManagerSingleton.getDefault().getConnectionForproGres());
+            tokenSummaryTableModel.getAllToken(EntityManagerSingleton.getDefault().getConnection());
             adaptTable();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
@@ -737,7 +577,7 @@ public final class TokenPrintingTopComponent extends TopComponent {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try {
-            tokenSummaryTableModel.getTodayToken(EntityManagerSingleton.getDefault().getConnectionForproGres());
+            tokenSummaryTableModel.getTodayToken(EntityManagerSingleton.getDefault().getConnection());
             adaptTable();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
@@ -751,13 +591,14 @@ public final class TokenPrintingTopComponent extends TopComponent {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void previewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previewButtonActionPerformed
-        LongTaskBackgroundAction action = new LongTaskBackgroundAction("Preview Token for " + caseNumberTextField.getText()) {
+        int selectedRow = tokenTable.getSelectedRow();
+        final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5);
+        final String tokenGUID = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0);
+        LongTaskBackgroundAction action = new LongTaskBackgroundAction("Preview Token for " + caseNumber) {
 
             @Override
             protected void mainAction() {
-                int selectedRow = tokenTable.getSelectedRow();
-                final String caseNumber = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 5);
-                final String tokenGUID = (String) tokenTableModel.getValueAt(tokenTable.convertRowIndexToModel(selectedRow), 0);
+
                 TokenManagerService.effectivePreviewToken(tokenGUID, caseNumber, reportLocation);
             }
         };
@@ -767,6 +608,8 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private void reloadChartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadChartButtonActionPerformed
         try {
             TokenDateFilter form = new TokenDateFilter();
+            form.setStartDate(TokenManagerService.getMinReceptionDate());
+            form.setEndDate(TokenManagerService.getMaxReceptionDate());
             String msg = "Date Filtration for Arrival Chart";
             DialogDescriptor dd = new DialogDescriptor(form, msg);
             Object result = DialogDisplayer.getDefault().notify(dd);
@@ -794,36 +637,19 @@ public final class TokenPrintingTopComponent extends TopComponent {
     }//GEN-LAST:event_cumulativeToggleButtonActionPerformed
 
 
-    private void registerComplainsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerComplainsButtonActionPerformed
-        final String caseNumber = caseNumberTextField.getText();
-        final VisitReason reason = (VisitReason) reasonComboBox.getSelectedItem();
-        final Gate gate = (Gate) gateComboBox.getSelectedItem();
-        TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(), gate.getGateName());
-
-    }//GEN-LAST:event_registerComplainsButtonActionPerformed
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
-    private javax.swing.JTextField caseNumberTextField;
     private javax.swing.ButtonGroup categoryButtonGroup;
-    private javax.swing.JComboBox categoryComboBox;
     private org.jdesktop.swingx.JXHeader child2Header;
     private org.jdesktop.swingx.JXHeader childHeader;
     private javax.swing.JToggleButton cumulativeToggleButton;
     private javax.swing.JToggleButton dailyToggleButton;
     private javax.swing.JPanel dataCollectionPanel;
     private javax.swing.JButton exportToExcelButton;
-    private javax.swing.JComboBox gateComboBox;
     private java.util.List<org.unhcr.eg.registration.tool.token.printing.models.Gate> gates;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
@@ -846,10 +672,6 @@ public final class TokenPrintingTopComponent extends TopComponent {
     private javax.swing.JLabel photoLabel;
     private javax.swing.JButton previewButton;
     private javax.swing.JButton printAgainButton;
-    private javax.swing.JButton printTokenButton;
-    private javax.swing.JButton printTokenButton1;
-    private javax.swing.JComboBox reasonComboBox;
-    private javax.swing.JButton registerComplainsButton;
     private javax.swing.JButton reloadChartButton;
     private javax.swing.JPanel reportPanel;
     private org.jdesktop.swingx.JXTable summaryXTable;

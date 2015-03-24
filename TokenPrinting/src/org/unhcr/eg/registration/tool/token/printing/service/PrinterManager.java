@@ -22,6 +22,8 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperPrintManager;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -107,7 +109,7 @@ public class PrinterManager {
     }
 
     public String print() throws JRException, FileNotFoundException {
-        Connection connection = EntityManagerSingleton.getDefault().getConnectionForproGres();
+        Connection connection = EntityManagerSingleton.getDefault().getConnection();
 
         if (is != null) {
             jasperPrint = JasperFillManager.fillReport(is, params, connection);
@@ -120,7 +122,6 @@ public class PrinterManager {
         if (selectedService != null) {
             try {
                 printerJob.setPrintService(selectedService);
-                
                 boolean printSucceed = JasperPrintManager.printReport(jasperPrint, false);
                 if (printSucceed) {
                     System.out.println("Successfullly Printed");
@@ -129,6 +130,9 @@ public class PrinterManager {
             } catch (PrinterException | JRException ex) {
                 Exceptions.printStackTrace(ex);
             }
+        } else {
+            NotifyDescriptor nd = new NotifyDescriptor.Message("No printer selected", NotifyDescriptor.ERROR_MESSAGE);
+            DialogDisplayer.getDefault().notify(nd);
         }
         return null;
     }

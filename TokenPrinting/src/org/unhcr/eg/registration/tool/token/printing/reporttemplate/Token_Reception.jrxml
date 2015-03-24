@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Token_Reception_add" language="groovy" pageWidth="226" pageHeight="850" columnWidth="198" leftMargin="14" rightMargin="14" topMargin="14" bottomMargin="14" uuid="964bc8bf-9541-4bce-b4c7-40ad36f586b7">
 	<property name="ireport.zoom" value="1.9487171000000014"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="240"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="0.0" lineColor="#000000"/>
@@ -32,10 +32,9 @@
 		</box>
 	</style>
 	<subDataset name="issuesWithCase" uuid="ee330d85-75ce-4b3d-8492-08f874f4e0dd">
-		<parameter name="IndividualGUID" class="java.lang.String"/>
 		<parameter name="TokenGUID" class="java.lang.String"/>
 		<queryString>
-			<![CDATA[EXEC [Get_List_Of_Mistakes_New] $P{IndividualGUID}, $P{TokenGUID}]]>
+			<![CDATA[EXEC [Get_List_Of_Mistakes] $P{TokenGUID}]]>
 		</queryString>
 		<field name="IssueGUID" class="java.lang.String"/>
 		<field name="TokenDistributedGUID" class="java.lang.String"/>
@@ -50,15 +49,24 @@
 	<subDataset name="currentAppointments" uuid="4eb3b0bf-5857-452c-96c3-ec654c415118">
 		<parameter name="Case_Number" class="java.lang.String"/>
 		<queryString>
-			<![CDATA[SELECT DISTINCT
-                      dbo.vDQNPEvent.EventShortName + ' - ' + dbo.vDQIndividual.IndividualID + ' ' + dbo.vDQIndividual.ConcatenatedName AS WithPendingAppoitment
-FROM         dbo.vDQNPEvent INNER JOIN
-                      dbo.vDQIndividual ON dbo.vDQNPEvent.IndividualGUID = dbo.vDQIndividual.IndividualGUID
-WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'RSD20', N'RSD136', N'RSD39', N'RSD49', N'RSD60', N'RSD75', N'RSD82',
-                      N'RSD104', N'RSD112', N'VOL02')) AND (dbo.vDQNPEvent.EventLogstatus = N'P') AND
-                      (dbo.vDQIndividual.ProcessingGroupNumber = $P{Case_Number})]]>
+			<![CDATA[EXEC [Get_Compiled_Appointments] $P{Case_Number}]]>
 		</queryString>
 		<field name="WithPendingAppoitment" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="informationAboutCase" uuid="57fdb8d6-ddaf-481b-b52d-46422669d104">
+		<parameter name="TokenGUID" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[EXEC [Get_List_Of_Information] $P{TokenGUID}]]>
+		</queryString>
+		<field name="IssueGUID" class="java.lang.String"/>
+		<field name="TokenDistributedGUID" class="java.lang.String"/>
+		<field name="MistakeLevel" class="java.lang.String"/>
+		<field name="LocationOfVerification" class="java.lang.String"/>
+		<field name="Scope" class="java.lang.String"/>
+		<field name="MessageError" class="java.lang.String"/>
+		<field name="IndividualID" class="java.lang.String"/>
+		<field name="ConcatenatedName" class="java.lang.String"/>
+		<filterExpression><![CDATA[$F{LocationOfVerification}.contains("1_")]]></filterExpression>
 	</subDataset>
 	<parameter name="Case_Number" class="java.lang.String"/>
 	<parameter name="Visit_Reason" class="java.lang.String"/>
@@ -165,16 +173,6 @@ WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'
 				<text><![CDATA[Family SIze]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4923aef8-3ce1-41f9-953d-4e79eff3ee2c" x="1" y="114" width="197" height="11"/>
-				<box>
-					<bottomPen lineWidth="2.0"/>
-				</box>
-				<textElement>
-					<font fontName="Calibri" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Issues to fix with the Case]]></text>
-			</staticText>
-			<staticText>
 				<reportElement uuid="94284d60-f036-47e6-8668-9915448cf3bd" x="14" y="31" width="55" height="11"/>
 				<box>
 					<bottomPen lineWidth="2.0"/>
@@ -194,42 +192,6 @@ WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'
 				</textElement>
 				<text><![CDATA[Admission Date and TIme]]></text>
 			</staticText>
-			<componentElement>
-				<reportElement uuid="c2245df7-db1b-488d-bcea-9770a075d9bf" key="table" style="table" x="1" y="125" width="197" height="23"/>
-				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="issuesWithCase" uuid="c545ec01-87c8-4597-b517-3a4a5f9d2e6c">
-						<datasetParameter name="IndividualGUID">
-							<datasetParameterExpression><![CDATA[$F{IndividualGUID}]]></datasetParameterExpression>
-						</datasetParameter>
-						<datasetParameter name="TokenGUID">
-							<datasetParameterExpression><![CDATA[$F{TokenDistributedGUID}]]></datasetParameterExpression>
-						</datasetParameter>
-						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-					</datasetRun>
-					<jr:column width="18" uuid="81787f7f-d447-48ce-bdf2-9f2b8296bf26">
-						<jr:detailCell height="20" rowSpan="1">
-							<textField>
-								<reportElement uuid="0746b062-61a7-4d12-95a1-b928220c7f23" x="0" y="0" width="18" height="20"/>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Calibri" size="8" isBold="false"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{REPORT_COUNT} + "."]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="174" uuid="b2a90b33-9057-45da-bb8a-cdc7c061eb36">
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="815abd48-687a-42dd-935b-32823c1921c9" x="0" y="0" width="174" height="20"/>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Calibri" size="8" isBold="false"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{MessageError} + " " +$F{IndividualID} + "-" +$F{ConcatenatedName}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-				</jr:table>
-			</componentElement>
 			<textField pattern="EEE, d MMM yyyy HH:mm:ss Z">
 				<reportElement uuid="6c7a1979-a9c0-499a-a9e6-5db4af4d5ce1" x="78" y="35" width="120" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -287,10 +249,98 @@ WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'
 				</textElement>
 				<textFieldExpression><![CDATA[$F{GateName}]]></textFieldExpression>
 			</textField>
+			<componentElement>
+				<reportElement uuid="0cb6d5b6-1ea0-4e1c-8751-c2718306f81a" key="table" style="table" x="-1" y="126" width="197" height="23"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="informationAboutCase" uuid="c22915d1-9e84-4288-9293-9902145b6cdc">
+						<datasetParameter name="TokenGUID">
+							<datasetParameterExpression><![CDATA[$F{TokenDistributedGUID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="18" uuid="f8874014-d3e3-4bd5-ab0e-32e6234e651f">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement uuid="3017c760-0b8e-4fa0-9143-7843e2843009" x="0" y="0" width="18" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT} + "."]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="174" uuid="a519df4a-67d9-4b99-b10d-d616e502329f">
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="5e12ffff-42a6-4e48-b60d-f7b53295ca70" x="0" y="0" width="174" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{MessageError} + " " +$F{IndividualID} + "-" +$F{ConcatenatedName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement uuid="172be2d2-f89f-4d47-952a-84df8e464a61" x="0" y="115" width="197" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Information about the Case]]></text>
+			</staticText>
 		</band>
 		<band height="35">
 			<staticText>
-				<reportElement uuid="6f08b984-a92d-4125-a50b-5e2ee28fafd4" x="1" y="0" width="197" height="11"/>
+				<reportElement uuid="4923aef8-3ce1-41f9-953d-4e79eff3ee2c" x="2" y="1" width="197" height="11"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Issues to fix with the Case]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement uuid="c2245df7-db1b-488d-bcea-9770a075d9bf" key="table" style="table" x="2" y="12" width="197" height="23"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="issuesWithCase" uuid="7b051f5f-9766-4184-a156-5709ccf3d66b">
+						<datasetParameter name="TokenGUID">
+							<datasetParameterExpression><![CDATA[$F{TokenDistributedGUID}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="18" uuid="81787f7f-d447-48ce-bdf2-9f2b8296bf26">
+						<jr:detailCell height="20" rowSpan="1">
+							<textField>
+								<reportElement uuid="0746b062-61a7-4d12-95a1-b928220c7f23" x="0" y="0" width="18" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT} + "."]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="174" uuid="b2a90b33-9057-45da-bb8a-cdc7c061eb36">
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="815abd48-687a-42dd-935b-32823c1921c9" x="0" y="0" width="174" height="20"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Calibri" size="8" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{MessageError} + " " +$F{IndividualID} + "-" +$F{ConcatenatedName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="35">
+			<staticText>
+				<reportElement uuid="6f08b984-a92d-4125-a50b-5e2ee28fafd4" x="2" y="0" width="197" height="11"/>
 				<box>
 					<bottomPen lineWidth="2.0"/>
 				</box>
@@ -300,7 +350,7 @@ WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'
 				<text><![CDATA[Pending Appoitments]]></text>
 			</staticText>
 			<componentElement>
-				<reportElement uuid="245ac353-db7e-4204-92c6-588a650ae00c" key="table" style="table" x="0" y="11" width="197" height="23"/>
+				<reportElement uuid="245ac353-db7e-4204-92c6-588a650ae00c" key="table" style="table" x="1" y="11" width="197" height="23"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<datasetRun subDataset="currentAppointments" uuid="e75e49a5-cec4-4b57-af35-03141fe0ebc3">
 						<datasetParameter name="Case_Number">
@@ -345,7 +395,7 @@ WHERE     (dbo.vDQNPEvent.EventID IN (N'REG15', N'PR007', N'RST05', N'RSD06', N'
 				<text><![CDATA[Referral Mechanism]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement uuid="8d43f517-5df3-4d27-b974-059ef05645ac" mode="Transparent" x="0" y="11" width="196" height="123" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement uuid="8d43f517-5df3-4d27-b974-059ef05645ac" mode="Transparent" x="0" y="11" width="198" height="123" forecolor="#000000" backcolor="#FFFFFF"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" markup="none">
 					<font fontName="Calibri" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>

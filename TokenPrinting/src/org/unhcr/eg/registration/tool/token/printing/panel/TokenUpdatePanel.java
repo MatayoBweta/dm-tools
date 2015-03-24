@@ -225,10 +225,11 @@ public class TokenUpdatePanel extends JFXPanel {
 
     private void registerQuery(ActionEvent event) {
         final String caseNumber = caseNumberText.getText();
-        final VisitReason reason = (VisitReason) serviceRequestedCombobox.getSelectionModel().getSelectedItem();
+        final VisitReason reason = serviceRequestedCombobox.getSelectionModel().getSelectedItem();
+        final VisitCategory category = groupeOfServiceCombobox.getSelectionModel().getSelectedItem();
         final Gate gate = (Gate) gateCombobox.getSelectionModel().getSelectedItem();
-        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
-            TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(), gate.getGateName());
+        if (VisitCategoryController.checkCaseNumber(caseNumber) > -1) {
+            TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(),category.getSectionText()+" - "+ reason.getReasonText(), gate.getGateName());
         } else {
             NotifyDescriptor.Message m = new NotifyDescriptor.Message("Case Number Not existing in proGres", NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notify(m);
@@ -246,7 +247,7 @@ public class TokenUpdatePanel extends JFXPanel {
         final String caseNumber = caseNumberText.getText();
         final VisitReason reason = (VisitReason) serviceRequestedCombobox.getSelectionModel().getSelectedItem();
         final Gate gate = (Gate) gateCombobox.getSelectionModel().getSelectedItem();
-        if (VisitCategoryController.checkCaseNumber(caseNumber)) {
+        if (VisitCategoryController.checkCaseNumber(caseNumber) > -1) {
             TokenManagerService.printTokenAction(reason.getReasonCode(), caseNumber, gate.getGateName(), reportLocation);
         } else {
             NotifyDescriptor.Message m = new NotifyDescriptor.Message("Case Number Not existing in proGres", NotifyDescriptor.ERROR_MESSAGE);

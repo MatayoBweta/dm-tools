@@ -21,6 +21,14 @@ public class TokenDateFilter extends javax.swing.JPanel {
         return endXDatePicker.getDate();
     }
 
+    public void setStartDate(Date date) {
+        startXDatePicker.setDate(date);
+    }
+
+    public void setEndDate(Date date) {
+        endXDatePicker.setDate(date);
+    }
+
     /**
      * Creates new form TokenDateFilter
      */
