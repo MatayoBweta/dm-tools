@@ -7,24 +7,28 @@
         <script type="text/javascript">
 
             function addIndividuals(data) {
+                $('#container').highcharts().setTitle({text: "Attendance of Persons of concern"});
                 $('#container').highcharts().showLoading('Loading data from server...');
                 $('#container').highcharts().series[0].setData(data);
                 $('#container').highcharts().hideLoading();
             }
 
             function addCases(data) {
+                $('#container').highcharts().setTitle({text: "Attendance of Persons of concern"});
                 $('#container').highcharts().showLoading('Loading data from server...');
                 $('#container').highcharts().series[1].setData(data);
                 $('#container').highcharts().hideLoading();
             }
 
             function addCumulateIndividuals(data) {
+                $('#container').highcharts().setTitle({text: "Cumulative Attendance of Persons of concern"});
                 $('#container').highcharts().showLoading('Loading data from server...');
                 $('#container').highcharts().series[2].setData(data);
                 $('#container').highcharts().hideLoading();
             }
 
             function addCumulateCases(data) {
+                $('#container').highcharts().setTitle({text: "Cumulative Attendance of Persons of concern"});
                 $('#container').highcharts().showLoading('Loading data from server...');
                 $('#container').highcharts().series[3].setData(data);
                 $('#container').highcharts().hideLoading();
@@ -69,7 +73,7 @@
                         selected: 3
                     },
                     title: {
-                        text: 'Arrivals of Persons of concern'
+                        text: 'Attendance of Persons of concern'
                     }, legend: {
                         enabled: true,
                         layout: 'vertical',
@@ -109,7 +113,6 @@
     <body>
         <script src="highstock.js"></script>
         <script src="exporting.js"></script>
-
-        <div id="container" style="height: 400px; min-width: 310px"></div>
+        <div id="container" style="height: 100%; min-width: 310px"></div>
     </body>
 </html>

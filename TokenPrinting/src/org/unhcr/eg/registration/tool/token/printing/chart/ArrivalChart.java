@@ -45,7 +45,6 @@ public class ArrivalChart extends JFXPanel {
     private boolean ready;
 
     public ArrivalChart() throws Exception {
-
         startingDate = TokenManagerService.getMinReceptionDate();
         endDate = TokenManagerService.getMaxReceptionDate();
     }

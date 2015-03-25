@@ -24,10 +24,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import org.openide.awt.Notification;
 import org.unhcr.eg.registration.tool.token.printing.models.Gate;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitCategory;
 import org.unhcr.eg.registration.tool.token.printing.models.VisitReason;
@@ -189,7 +187,12 @@ public class TokenUpdatePanel extends JFXPanel {
 
         groupeOfServiceCombobox.getSelectionModel().selectFirst();
         gateCombobox.getSelectionModel().selectFirst();
-
+        
+        VisitCategory selectedCategory = groupeOfServiceCombobox.getSelectionModel().getSelectedItem();
+        serviceRequestedData.clear();
+        serviceRequestedData.addAll(VisitCategoryController.getReasonList(selectedCategory.getSectionCode()));
+        serviceRequestedCombobox.getSelectionModel().selectFirst();
+        
         Label phoneNumberLabel = new Label("Phone Number");
         panel.add(phoneNumberLabel, 0, row);
         phoneNumber = new TextField();
@@ -229,7 +232,7 @@ public class TokenUpdatePanel extends JFXPanel {
         final VisitCategory category = groupeOfServiceCombobox.getSelectionModel().getSelectedItem();
         final Gate gate = (Gate) gateCombobox.getSelectionModel().getSelectedItem();
         if (VisitCategoryController.checkCaseNumber(caseNumber) > -1) {
-            TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(),category.getSectionText()+" - "+ reason.getReasonText(), gate.getGateName());
+            TokenManagerService.registerServiceRequestAction(caseNumber, reason.getReasonCode(), category.getSectionText() + " - " + reason.getReasonText(), gate.getGateName());
         } else {
             NotifyDescriptor.Message m = new NotifyDescriptor.Message("Case Number Not existing in proGres", NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notify(m);
