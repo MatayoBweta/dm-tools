@@ -5,6 +5,7 @@
  */
 package org.unhcr.eg.registration.tool.token.printing.service;
 
+import org.unhcr.eg.registration.security.report.PrinterManager;
 import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.io.FileNotFoundException;
@@ -233,7 +234,7 @@ public class TokenManagerService {
         manager.setParameter("Visit_Reason", reason);
         manager.setParameter("Gate_Name", gate);
         manager.setParameter("Number_Individual", numberOfIndividuals);
-        manager.print();
+        manager.print(true);
     }
 
     public static boolean printNewRegistrationTokenAction(String gate, String reportLocation) {

@@ -40,6 +40,7 @@ import org.openide.modules.ModuleInstall;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 import org.openide.windows.WindowManager;
+import org.unhcr.eg.registration.security.report.PrinterPanel;
 import org.unhcr.eg.registration.security.ui.DatabaseCheckForm;
 import org.unhcr.eg.registration.security.ui.DatabaseCheckFormproGres;
 
@@ -60,7 +61,7 @@ public class Installer extends ModuleInstall {
         Platform.setImplicitExit(false);
         SwingUtilities.invokeLater(() -> {
             JFrame frame = (JFrame) WindowManager.getDefault().getMainWindow();
-            frame.setTitle("Data  Management Tools");
+            frame.setTitle("Data Management Tools");
             frame.setGlassPane(new JXBusyLabel());
         });
 
@@ -72,6 +73,7 @@ public class Installer extends ModuleInstall {
         try {
             showDBForm();
             showDBFormproGres();
+            showDefaultPrinter();
         } catch (IllegalBlockSizeException ex) {
             Exceptions.printStackTrace(ex);
         } catch (NoSuchPaddingException ex) {
@@ -113,9 +115,7 @@ public class Installer extends ModuleInstall {
     protected void printAttribute(FileObject fileObject, String nameRegex) {
         if (fileObject.getPath().contains(nameRegex)) {
             try {
-                System.out.println("---------------------------------------------------------------------------------- ");
-                System.out.println("Action Name " + fileObject.getName());
-                System.out.println("Action Path " + fileObject.getPath());
+
                 DataObject d = DataObject.find(fileObject);
                 InstanceCookie c = d.getLookup().lookup(InstanceCookie.class);
                 c.instanceClass();
@@ -173,7 +173,7 @@ public class Installer extends ModuleInstall {
         String userID = Crypto.decrypt(node.get("database.user", Crypto.encrypt("proGresDBUser")));
         String password = Crypto.decrypt(node.get("database.password", Crypto.encrypt("sqladmin")));
 
-        if (!DatabaseUtility.pingDatabase(url, userID, password)) {
+        while (!DatabaseUtility.pingDatabase(url, userID, password)) {
             try {
                 formDB = DatabaseCheckForm.getDefaultForLogin();
             } catch (InterruptedException | InvocationTargetException ex1) {
@@ -194,7 +194,7 @@ public class Installer extends ModuleInstall {
         String userID = Crypto.decrypt(node.get("database.user.proGres", Crypto.encrypt("proGresDBUser")));
         String password = Crypto.decrypt(node.get("database.password.proGres", Crypto.encrypt("sqladmin")));
 
-        if (!DatabaseUtility.checkProGresDataabse(url, userID, password)) {
+        while (!DatabaseUtility.checkProGresDataabse(url, userID, password)) {
             try {
                 formDB = DatabaseCheckFormproGres.getDefaultForLogin();
             } catch (InterruptedException | InvocationTargetException ex1) {
@@ -225,5 +225,20 @@ public class Installer extends ModuleInstall {
             }
         });
 
+    }
+
+    private void showDefaultPrinter() {
+        Preferences node = NbPreferences.root();
+        String firstDefaultPrinter = node.get("default.token.printer", null);
+        PrinterPanel formDB = null;
+        DialogDescriptor nd = null;
+        while (firstDefaultPrinter == null) {
+            if (formDB == null) {
+                formDB = new PrinterPanel();
+                nd = DialogUtility.createDialogDescriptor(formDB, "Choose Default Token Printer", true, new Object[]{formDB.getSave(), formDB.getCancel()}, new Object[]{formDB.getSave(), formDB.getCancel()}, formDB.getSave(), formDB);
+            }
+            DialogDisplayer.getDefault().notify(nd);
+            firstDefaultPrinter = node.get("default.token.printer", null);
+        }
     }
 }
