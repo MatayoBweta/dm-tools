@@ -33,6 +33,7 @@ import org.unhcr.eg.registration.tool.token.printing.panel.RequestDetailsPanel;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
 import org.unhcr.eg.registration.tool.token.printing.models.CommentInput;
 import org.unhcr.eg.registration.tool.token.printing.models.TokenDetails;
+import org.unhcr.eg.registration.tool.token.printing.models.VisitSummary;
 import org.unhcr.eg.registration.tool.token.printing.panel.CommentPanel;
 
 /**
@@ -129,6 +130,7 @@ public class TokenManagerService {
 
     private static final String RECEPTION_CASE_DATA = "{call GetDailyCumulativeVisit(?,?,?)}";
     private static final String GET_NEXT_TOKEN = "{call Get_Token_Details_New(?,?,?,?,?,?)}";
+    private static final String GET_VISIT_TREND = "{call Get_Visit_Trend(?,?)}";
 
     public static TreeMap<Timestamp, List<AccessTimeReport>> getAccessTimeReport(Date startingDate, Date endDate, Date lastUploadDate) throws SQLException {
         TreeMap<Timestamp, List<AccessTimeReport>> accessTimeReports = new TreeMap<>();
@@ -151,6 +153,27 @@ public class TokenManagerService {
             accessTimeReports.get(accesDateTime).add(new AccessTimeReport(accesDateTime, gate, typeOfNumber, number, cumulativeNumber));
         }
         return accessTimeReports;
+    }
+
+    public static TreeMap<String, List<VisitSummary>> getVisitTrendReport(Date startingDate, Date endDate) throws SQLException {
+        TreeMap<String, List<VisitSummary>> visitSummaries = new TreeMap<>();
+        Connection connection = EntityManagerSingleton.getDefault().getConnection();
+        String getCaseData = GET_VISIT_TREND;
+        CallableStatement statement = connection.prepareCall(getCaseData);
+        statement.setDate(1, startingDate);
+        statement.setDate(2, endDate);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()) {
+            Integer count = rs.getInt("Cases");
+            Integer individuals = rs.getInt("Individuals");
+            String category = rs.getString("Category");
+            String reason = rs.getString("Reason");
+            if (visitSummaries.get(category) == null) {
+                visitSummaries.put(category, new ArrayList<>());
+            }
+            visitSummaries.get(category).add(new VisitSummary(category, reason, count, individuals));
+        }
+        return visitSummaries;
     }
 
     public static TokenDetails addToken(String caseNumber, String reason, String gate, int numberOfIndividuals, String comments) throws SQLException {

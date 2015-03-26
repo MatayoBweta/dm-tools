@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
@@ -23,6 +24,9 @@ import javafx.scene.web.WebView;
 
 import org.unhcr.eg.registration.security.date.ClockManager;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
+import org.unhcr.eg.registration.tool.token.printing.models.DrillDownDetails;
+import org.unhcr.eg.registration.tool.token.printing.models.DrillDownMain;
+import org.unhcr.eg.registration.tool.token.printing.models.VisitSummary;
 import org.unhcr.eg.registration.tool.token.printing.service.TokenManagerService;
 import org.w3c.dom.Document;
 
@@ -42,7 +46,9 @@ public class ArrivalChart extends JFXPanel {
     private Date lastLoadingDate = new Date(0);
     private WebView webview;
     private TreeMap<java.sql.Timestamp, List<AccessTimeReport>> accessTimeReports;
+    private TreeMap<String, List<VisitSummary>> visitTrendReport;
     private boolean ready;
+    private String[] colors = {"#F16F00", "#F18E00", "#F1AA00", "#F1C500", "#F1DE00", "#DFF100", "#99FF66", "#66FF99", "#6666FF", "#9966FF", "#FF9966", "#FFCC66"};
 
     public ArrivalChart() throws Exception {
         startingDate = TokenManagerService.getMinReceptionDate();
@@ -61,11 +67,13 @@ public class ArrivalChart extends JFXPanel {
 
     public void getFreshData() throws SQLException {
         accessTimeReports = TokenManagerService.getAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate), ClockManager.getSQLDate(lastLoadingDate));
+        visitTrendReport = TokenManagerService.getVisitTrendReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
         getOfflineData(0);
     }
 
     public void getFreshData(Date startingDate, Date endDate) throws SQLException {
         accessTimeReports = TokenManagerService.getAccessTimeReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate), ClockManager.getSQLDate(lastLoadingDate));
+        visitTrendReport = TokenManagerService.getVisitTrendReport(ClockManager.getSQLDate(startingDate), ClockManager.getSQLDate(endDate));
         getOfflineData(0);
     }
 
@@ -90,8 +98,35 @@ public class ArrivalChart extends JFXPanel {
         Platform.runLater(() -> {
             webview.getEngine().executeScript("removeData()");
             parseData(accessTimeReports, i);
+            parseVisitTrend(visitTrendReport);
         });
+    }
 
+    private void parseVisitTrend(TreeMap<String, List<VisitSummary>> visitTrendReport) {
+        String name = "'Visit Reason'";
+        List<DrillDownMain> ddms = new ArrayList<>();
+        List<String> categories = new ArrayList<>();
+        Gson gson = new Gson();
+        int i = 7;
+        for (Map.Entry<String, List<VisitSummary>> entrySet : visitTrendReport.entrySet()) {
+            i++;
+            String key = entrySet.getKey();
+            categories.add(key);
+            DrillDownMain ddm = new DrillDownMain(key, 0, colors[i], new DrillDownDetails());
+            List<VisitSummary> value = entrySet.getValue();
+            for (VisitSummary value1 : value) {
+                ddm.getDrilldown().setName(key);
+                ddm.getDrilldown().getCategories().add(value1.getReason());
+                ddm.getDrilldown().getData().add(value1.getCount());
+                ddm.setY(value1.getCount() + ddm.getY());
+                ddm.getDrilldown().setColor(colors[i]);
+            }
+
+            ddms.add(ddm);
+        }
+        webview.getEngine().executeScript("setChart(" + name + "," + gson.toJson(categories) + "," + gson.toJson(ddms) + "," + "'white')");
+        System.out.println("gson.toJson(categories)" + gson.toJson(categories));
+        System.out.println("gson.toJson(ddms)" + gson.toJson(ddms));
     }
 
     protected void parseData(TreeMap<java.sql.Timestamp, List<AccessTimeReport>> caseAccessTimeReport, int i) {
@@ -131,7 +166,6 @@ public class ArrivalChart extends JFXPanel {
             System.out.println("addCumulateIndividuals addCumulateCases");
             webview.getEngine().executeScript("addCumulateIndividuals(" + gson.toJson(cumulateIndividuals) + ")");
             webview.getEngine().executeScript("addCumulateCases(" + gson.toJson(cumulateCases) + ")");
-
         }
     }
 

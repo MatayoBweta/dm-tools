@@ -5,6 +5,18 @@
         <title>Arrival Dashboard</title>
         <script type="text/javascript" src="jquery-1.8.2.min.js"></script>
         <script type="text/javascript">
+            var name, categories, data;
+            function setChart(name, categories, data, color) {
+                $('#container_2').highcharts().xAxis[0].setCategories(categories);
+                $('#container_2').highcharts().showLoading('Loading data from server...');
+                $('#container_2').highcharts().series[0].setData(data);
+                $('#container_2').highcharts().series[0].name = name;
+                this.name = name;
+                this.categories = categories;
+                this.data = data;
+                this.color = color;
+                $('#container_2').highcharts().hideLoading();
+            }
 
             function addIndividuals(data) {
                 $('#container').highcharts().setTitle({text: "Attendance of Persons of concern"});
@@ -40,7 +52,77 @@
                 }
             }
 
+            function setChartIntenral(name, categories, data, color) {
+                $('#container_2').highcharts().xAxis[0].setCategories(categories);
+                $('#container_2').highcharts().series[0].remove();
+                $('#container_2').highcharts().addSeries({
+                    name: name,
+                    data: data,
+                    color: color || 'white'
+                });
+            }
             $(function () {
+                $('#container_2').highcharts({
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: 'Visit Reasons Trend'
+                    },
+                    subtitle: {
+                        text: 'Click the columns to view versions. Click again to view brands.'
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Number Of cases'
+                        }
+                    },
+                    plotOptions: {
+                        column: {
+                            cursor: 'pointer',
+                            point: {
+                                events: {
+                                    click: function () {
+                                        var drilldown = this.drilldown;
+                                        if (drilldown) { // drill down
+                                            setChartIntenral(drilldown.name, drilldown.categories, drilldown.data, drilldown.color);
+                                        } else { // restore
+                                            setChartIntenral(name, categories, data);
+                                        }
+                                    }
+                                }
+                            },
+                            dataLabels: {
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold'
+                                },
+                                formatter: function () {
+                                    return this.y;
+                                }
+                            }
+                        }
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            var point = this.point,
+                                    s = this.x + ':<b>' + this.y + ' cases showed</b><br/>';
+                            if (point.drilldown) {
+                                s += 'Click to view ' + ' reasons of visit for category '+ point.category ;
+                            } else {
+                                s += 'Click to return to visit categories';
+                            }
+                            return s;
+                        }
+                    },
+                    series: [{
+                            name: 'Visit Reasons'
+                        }],
+                    exporting: {
+                        enabled: false
+                    }
+                });
+
                 $('#container').highcharts('StockChart', {
                     chart: {
                         zoomType: 'x'
@@ -106,13 +188,18 @@
                             }, turboThreshold: 0
                         }]
                 });
-
             });
+
         </script>
     </head>
     <body>
+        <script src="highcharts.js"></script>
         <script src="highstock.js"></script>
         <script src="exporting.js"></script>
-        <div id="container" style="height: 100%; min-width: 310px"></div>
+
+        <script src="data.js"></script>
+        <script src="drilldown.js"></script>
+        <div id="container" style="height: 100%; max-width: 100%"></div>
+        <div id="container_2" style="height: 100%; max-width: 100%"></div>
     </body>
 </html>

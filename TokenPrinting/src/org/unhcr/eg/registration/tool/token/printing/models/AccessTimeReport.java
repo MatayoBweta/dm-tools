@@ -27,8 +27,6 @@ public class AccessTimeReport {
         this.cumulativeNumber = cumulativeNumber;
     }
 
-   
-
     public Date getAccessTime() {
         return accessTime;
     }
