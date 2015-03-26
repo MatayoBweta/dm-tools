@@ -13,6 +13,7 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
+import org.openide.LifecycleManager;
 import org.openide.util.NbPreferences;
 
 /**
@@ -26,6 +27,7 @@ public class PrinterPanel extends javax.swing.JPanel implements ActionListener {
     private Preferences node = NbPreferences.root();
     private JButton save;
     private JButton cancel;
+    private boolean beginning;
 
     public JButton getCancel() {
         return cancel;
@@ -46,7 +48,7 @@ public class PrinterPanel extends javax.swing.JPanel implements ActionListener {
     /**
      * Creates new form PrinterPanel
      */
-    public PrinterPanel() {
+    public PrinterPanel(boolean beginning) {
         firstDefaultPrinter = node.get("default.token.printer", null);
         actionListener = (ActionEvent e) -> {
             JRadioButton button = (JRadioButton) e.getSource();
@@ -55,6 +57,7 @@ public class PrinterPanel extends javax.swing.JPanel implements ActionListener {
         initComponents();
         save = new JButton("Save");
         save.setActionCommand("Save");
+        this.beginning = beginning;
 
         cancel = new JButton("Cancel");
         cancel.setActionCommand("Cancel");
@@ -109,10 +112,15 @@ public class PrinterPanel extends javax.swing.JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Save":
-
                 break;
             case "Cancel":
-                node.put("default.token.printer", firstDefaultPrinter);
+                if (firstDefaultPrinter != null) {
+                    node.put("default.token.printer", firstDefaultPrinter);
+                }
+                if (beginning) {
+                    System.exit(0);
+                }
+
                 break;
 
         }

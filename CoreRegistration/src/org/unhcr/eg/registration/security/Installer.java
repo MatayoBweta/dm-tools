@@ -29,6 +29,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.JXBusyLabel;
+import org.jdesktop.swingx.auth.DefaultUserNameStore;
+import org.jdesktop.swingx.auth.LoginService;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -234,11 +236,12 @@ public class Installer extends ModuleInstall {
         DialogDescriptor nd = null;
         while (firstDefaultPrinter == null) {
             if (formDB == null) {
-                formDB = new PrinterPanel();
+                formDB = new PrinterPanel(true);
                 nd = DialogUtility.createDialogDescriptor(formDB, "Choose Default Token Printer", true, new Object[]{formDB.getSave(), formDB.getCancel()}, new Object[]{formDB.getSave(), formDB.getCancel()}, formDB.getSave(), formDB);
             }
             DialogDisplayer.getDefault().notify(nd);
             firstDefaultPrinter = node.get("default.token.printer", null);
         }
     }
+
 }

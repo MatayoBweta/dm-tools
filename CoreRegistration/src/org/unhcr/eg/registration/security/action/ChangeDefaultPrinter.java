@@ -34,7 +34,7 @@ public final class ChangeDefaultPrinter implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        formPrinter = new PrinterPanel();
+        formPrinter = new PrinterPanel(false);
         DialogDescriptor nd = DialogUtility.createDialogDescriptor(formPrinter, "Change Default Token Printer", true, new Object[]{formPrinter.getSave(), formPrinter.getCancel()}, new Object[]{formPrinter.getSave(), formPrinter.getCancel()}, formPrinter.getSave(), formPrinter);
         DialogDisplayer.getDefault().notify(nd);
     }
