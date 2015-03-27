@@ -48,7 +48,7 @@ public class ArrivalChart extends JFXPanel {
     private TreeMap<java.sql.Timestamp, List<AccessTimeReport>> accessTimeReports;
     private TreeMap<String, List<VisitSummary>> visitTrendReport;
     private boolean ready;
-    private String[] colors = {"#F16F00", "#F18E00", "#F1AA00", "#F1C500", "#F1DE00", "#DFF100", "#99FF66", "#66FF99", "#6666FF", "#9966FF", "#FF9966", "#FFCC66"};
+    private String[] colors = {"#F85D2C", "#23709E", "#1FAE66", "#F89C2C", "#939BA2", "#DFF100", "#99FF66", "#66FF99", "#6666FF", "#9966FF", "#FF9966", "#FFCC66"};
 
     public ArrivalChart() throws Exception {
         startingDate = TokenManagerService.getMinReceptionDate();
