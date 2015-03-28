@@ -46,4 +46,12 @@ public class VisitSummary {
         this.reason = reason;
     }
 
+    public Integer getIndividuals() {
+        return individuals;
+    }
+
+    public void setIndividuals(Integer individuals) {
+        this.individuals = individuals;
+    }
+
 }

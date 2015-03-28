@@ -5,30 +5,76 @@
         <title>Arrival Dashboard</title>
         <script type="text/javascript" src="jquery-1.8.2.min.js"></script>
         <script type="text/javascript">
+            var name, categories, data;
             var seriesData = {};
+            function setChart(name, categories, data, color) {
 
-            function setChartIntenral(name, categories, data, color, serieNumber) {
-                if (serieNumber) {
-                    var serie = {
-                        "name": name,
-                        "categories": categories,
-                        "data": data,
-                        "color": color
-                    };
-                    seriesData[serieNumber] = serie;
-                }
+                $('#container_2').highcharts().xAxis[0].setCategories(categories);
+                $('#container_2').highcharts().showLoading('Loading data from server...');
+                $('#container_2').highcharts().series[0].setData(data);
+                $('#container_2').highcharts().series[0].name = name;
+                $('#container_2').highcharts().hideLoading();
+            }
+
+            function setChart_(name, categories, data, color, serieNumber) {
+                $('#container_2').highcharts().xAxis[0].setCategories(categories);
+                $('#container_2').highcharts().showLoading('Loading data from server...');
+                $('#container_2').highcharts().series[serieNumber].setData(data);
+                $('#container_2').highcharts().series[serieNumber].name = name;
+                this.name[serieNumber] = name;
+                this.data[serieNumber] = data;
+                this.color[serieNumber] = color;
+                $('#container_2').highcharts().hideLoading();
+            }
+
+            function setChartIntenral_(name, categories, data, color, serieNumber) {
+                var serie = {
+                    "name": name,
+                    "categories": categories,
+                    "data": data,
+                    "color": color
+                };
+                seriesData[name] = serie;
                 $('#container_2').highcharts().xAxis[0].setCategories(categories);
                 $('#container_2').highcharts().showLoading('Loading data from server...');
                 $('#container_2').highcharts().series[serieNumber].setData(data);
                 $('#container_2').highcharts().series[serieNumber].name = name;
                 $('#container_2').highcharts().hideLoading();
+
             }
 
+            function addIndividuals(data) {
+                $('#container').highcharts().setTitle({text: "Attendance of Persons of concern"});
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[0].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
 
-            function addData(title, data, serie) {
+            function addData(title, data, serieNumber) {
                 $('#container').highcharts().setTitle({text: title});
                 $('#container').highcharts().showLoading('Loading data from server...');
-                $('#container').highcharts().series[serie].setData(data);
+                $('#container').highcharts().series[serieNumber].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
+
+            function addCases(data) {
+                $('#container').highcharts().setTitle({text: "Attendance of Persons of concern"});
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[1].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
+
+            function addCumulateIndividuals(data) {
+                $('#container').highcharts().setTitle({text: "Cumulative Attendance of Persons of concern"});
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[2].setData(data);
+                $('#container').highcharts().hideLoading();
+            }
+
+            function addCumulateCases(data) {
+                $('#container').highcharts().setTitle({text: "Cumulative Attendance of Persons of concern"});
+                $('#container').highcharts().showLoading('Loading data from server...');
+                $('#container').highcharts().series[3].setData(data);
                 $('#container').highcharts().hideLoading();
             }
 
@@ -36,6 +82,16 @@
                 for (i = 0; i < $('#container').highcharts().series.length; i++) {
                     $('#container').highcharts().series[i].setData([]);
                 }
+            }
+
+            function setChartIntenral(name, categories, data, color) {
+                $('#container_2').highcharts().xAxis[0].setCategories(categories);
+                $('#container_2').highcharts().series[0].remove();
+                $('#container_2').highcharts().addSeries({
+                    name: name,
+                    data: data,
+                    color: color || 'white'
+                });
             }
 
             $(function () {
@@ -48,7 +104,6 @@
                         'tooltips': ['Welcome', 'Visit trends', 'Reason of visit trends']
                     }
                 });
-
                 $('#container_2').highcharts({
                     chart: {
                         type: 'column'
@@ -76,8 +131,9 @@
                                         } else { // restore
                                             for (var key in seriesData) {
                                                 var serie = seriesData[key];
-                                                setChartIntenral(serie.name, serie.categories, serie.data, serie.color);
+                                                setChartIntenral(name, categories, data);
                                             }
+                                            setChartIntenral(name, categories, data);
                                         }
                                     }
                                 }

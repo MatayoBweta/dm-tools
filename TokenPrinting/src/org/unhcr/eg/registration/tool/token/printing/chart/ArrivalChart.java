@@ -23,6 +23,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.web.WebView;
 
 import org.unhcr.eg.registration.security.date.ClockManager;
+import org.unhcr.eg.registration.security.ui.ColorUtils;
 import org.unhcr.eg.registration.tool.token.printing.models.AccessTimeReport;
 import org.unhcr.eg.registration.tool.token.printing.models.DrillDownDetails;
 import org.unhcr.eg.registration.tool.token.printing.models.DrillDownMain;
@@ -103,8 +104,11 @@ public class ArrivalChart extends JFXPanel {
     }
 
     private void parseVisitTrend(TreeMap<String, List<VisitSummary>> visitTrendReport) {
-        String name = "'Visit Reason'";
+        String cases = "'Cases'";
+        String individuals = "'Individuals'";
+        
         List<DrillDownMain> ddms = new ArrayList<>();
+        List<DrillDownMain> ddms_i = new ArrayList<>();
         List<String> categories = new ArrayList<>();
         Gson gson = new Gson();
         int i = 7;
@@ -113,6 +117,7 @@ public class ArrivalChart extends JFXPanel {
             String key = entrySet.getKey();
             categories.add(key);
             DrillDownMain ddm = new DrillDownMain(key, 0, colors[i], new DrillDownDetails());
+            DrillDownMain ddm_i = new DrillDownMain(key, 0, colors[i], new DrillDownDetails());
             List<VisitSummary> value = entrySet.getValue();
             for (VisitSummary value1 : value) {
                 ddm.getDrilldown().setName(key);
@@ -120,13 +125,21 @@ public class ArrivalChart extends JFXPanel {
                 ddm.getDrilldown().getData().add(value1.getCount());
                 ddm.setY(value1.getCount() + ddm.getY());
                 ddm.getDrilldown().setColor(colors[i]);
+
+                ddm_i.getDrilldown().setName(key);
+                ddm_i.getDrilldown().getCategories().add(value1.getReason());
+                ddm_i.getDrilldown().getData().add(value1.getCount());
+                ddm_i.setY(value1.getIndividuals() + ddm.getY());
+                String color2 = ColorUtils.lighten(colors[i], "0.7");
+                ddm_i.getDrilldown().setColor(color2);
             }
 
             ddms.add(ddm);
+            ddms_i.add(ddm_i);
         }
-        webview.getEngine().executeScript("setChart(" + name + "," + gson.toJson(categories) + "," + gson.toJson(ddms) + "," + "'white')");
-        System.out.println("gson.toJson(categories)" + gson.toJson(categories));
-        System.out.println("gson.toJson(ddms)" + gson.toJson(ddms));
+        webview.getEngine().executeScript("setChartIntenral(" + cases + "," + gson.toJson(categories) + "," + gson.toJson(ddms) + "," + "'white',0)");
+        webview.getEngine().executeScript("setChartIntenral(" + individuals + "," + gson.toJson(categories) + "," + gson.toJson(ddms_i) + "," + "'white',1)");
+
     }
 
     protected void parseData(TreeMap<java.sql.Timestamp, List<AccessTimeReport>> caseAccessTimeReport, int i) {
@@ -159,13 +172,11 @@ public class ArrivalChart extends JFXPanel {
         });
         Gson gson = new Gson();
         if (i == 0) {
-            System.out.println("addIndividuals addCases");
-            webview.getEngine().executeScript("addIndividuals(" + gson.toJson(individuals) + ")");
-            webview.getEngine().executeScript("addCases(" + gson.toJson(cases) + ")");
+            webview.getEngine().executeScript("addData('Attendance of Persons of concern'," + gson.toJson(individuals) + ",0)");
+            webview.getEngine().executeScript("addData('Attendance of Persons of concern'," + gson.toJson(cases) + ",1)");
         } else if (i == 1) {
-            System.out.println("addCumulateIndividuals addCumulateCases");
-            webview.getEngine().executeScript("addCumulateIndividuals(" + gson.toJson(cumulateIndividuals) + ")");
-            webview.getEngine().executeScript("addCumulateCases(" + gson.toJson(cumulateCases) + ")");
+            webview.getEngine().executeScript("addData('Cumulative Attendance of Persons of concern'," + gson.toJson(cumulateIndividuals) + ",2)");
+            webview.getEngine().executeScript("addData('Cumulative Attendance of Persons of concern'," + gson.toJson(cumulateCases) + ",3)");
         }
     }
 
