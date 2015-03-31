@@ -75,8 +75,10 @@ public final class TokenPrintingTopComponent extends TopComponent {
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
+
         reportPanel.add(arrivalChart, BorderLayout.CENTER);
         dataCollectionPanel.add(tokenUpdatePanel, BorderLayout.CENTER);
+        
         Platform.runLater(() -> {
             try {
                 arrivalChart.init();
@@ -230,12 +232,12 @@ public final class TokenPrintingTopComponent extends TopComponent {
     }//GEN-LAST:event_reloadChartButtonActionPerformed
 
     private void dailyToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dailyToggleButtonActionPerformed
-        arrivalChart.getOfflineData(0);
+        arrivalChart.getOfflineData(0,1);
 
     }//GEN-LAST:event_dailyToggleButtonActionPerformed
 
     private void cumulativeToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cumulativeToggleButtonActionPerformed
-        arrivalChart.getOfflineData(1);
+        arrivalChart.getOfflineData(1,1);
 
     }//GEN-LAST:event_cumulativeToggleButtonActionPerformed
 

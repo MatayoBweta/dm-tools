@@ -20,6 +20,7 @@ public class VisitSummary {
         this.count = count;
         this.category = category;
         this.reason = reason;
+        this.individuals = individuals;
     }
 
     public Integer getCount() {

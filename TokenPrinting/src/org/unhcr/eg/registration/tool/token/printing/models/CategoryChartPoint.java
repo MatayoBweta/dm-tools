@@ -5,21 +5,20 @@
  */
 package org.unhcr.eg.registration.tool.token.printing.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author UNHCRuser
  */
-public class DrillDownDetails {
+public class CategoryChartPoint {
 
     private String name;
-    private List<ArrayList> data = new ArrayList<>();
+    private long y;
     private String color;
 
-    public DrillDownDetails(String id) {
-        this.name = id;
+    public CategoryChartPoint(String name, long y, String color) {
+        this.name = name;
+        this.y = y;
+        this.color = color;
     }
 
     public String getName() {
@@ -30,12 +29,12 @@ public class DrillDownDetails {
         this.name = name;
     }
 
-    public List<ArrayList> getData() {
-        return data;
+    public long getY() {
+        return y;
     }
 
-    public void setData(List<ArrayList> data) {
-        this.data = data;
+    public void setY(long y) {
+        this.y = y;
     }
 
     public String getColor() {

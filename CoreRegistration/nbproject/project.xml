@@ -162,6 +162,7 @@
                 <package>org.unhcr.eg.registration.security.exchange</package>
                 <package>org.unhcr.eg.registration.security.filechooser.filter</package>
                 <package>org.unhcr.eg.registration.security.jdbc</package>
+                <package>org.unhcr.eg.registration.security.list</package>
                 <package>org.unhcr.eg.registration.security.report</package>
                 <package>org.unhcr.eg.registration.security.ui</package>
             </public-packages>

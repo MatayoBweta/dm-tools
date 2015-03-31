@@ -9,30 +9,36 @@
         <script type="text/javascript">
 
             var seriesData = {};
-            var drilldownData = {};
 
-            function setDrilldown(drilldown) {
-                drilldownData = drilldown;
+            function setChartIntenral(name, categories, data, color, serieNumber) {
+                if (serieNumber > -1) {
+                    var serie = {
+                        "name": name,
+                        "categories": categories,
+                        "data": data,
+                        "color": color
+                    };
+                    seriesData[serieNumber] = serie;
+                    $('#container_2').highcharts().xAxis[0].setCategories(categories);
+                    $('#container_2').highcharts().showLoading('Loading data from server...');
+                    $('#container_2').highcharts().series[serieNumber].name = name;
+                    $('#container_2').highcharts().series[serieNumber].color = color;
+                    $('#container_2').highcharts().series[serieNumber].setData(data);
+                    $('#container_2').highcharts().hideLoading();
+                } else {
+                    $('#container_2').highcharts().addSeries({
+                        name: name,
+                        data: data,
+                        color: color || 'white'
+                    });
+                }
             }
 
-            function setChartIntenral(name, data, color, serieNumber) {
-                $('#container_2').highcharts().showLoading('Loading data from server...');
-                 $('#container_2').highcharts().addSeries({
-                    name: name,
-                    data: data,
-                    color: color || 'white'
-                });
-                $('#container_2').highcharts().hideLoading();
-            }
 
-            function addData(title, data, serie, color, endDate) {
+            function addData(title, data, serie) {
                 $('#container').highcharts().setTitle({text: title});
-                $('#container').highcharts().setTitle(null, {
-                    text: 'Data only for the last 30 days before ' + endDate});
                 $('#container').highcharts().showLoading('Loading data from server...');
                 $('#container').highcharts().series[serie].setData(data);
-                $('#container').highcharts().series[serie].options.color = color;
-                $('#container').highcharts().series[serie].update($('#container').highcharts().series[serie].options);
                 $('#container').highcharts().hideLoading();
             }
 
@@ -42,9 +48,10 @@
                 }
             }
 
-            function removeData_() {
-                while ($('#container_2').highcharts().series.length > 0)
+            function removeData_2() {
+                while ($('#container_2').highcharts().series.length > 0) {
                     $('#container_2').highcharts().series[0].remove(true);
+                }
             }
 
             $(function () {
@@ -60,37 +67,60 @@
 
                 $('#container_2').highcharts({
                     chart: {
-                        type: 'column',
-                        events: {
-                            drilldown: function (e) {
-                                if (!e.seriesOptions) {
-                                    var chart = this,
-                                            series = drilldownData[e.point.name];
-                                    chart.addSeriesAsDrilldown(e.point, series);
-                                }
-                            }
-                        }
+                        type: 'column'
                     },
                     title: {
                         text: 'Visit Reasons Trend'
                     },
-                    xAxis: {
-                        type: 'category',
-                        showEmpty: false
-                    },
-                    plotOptions: {
-                        series: {
-                            borderWidth: 0,
-                            dataLabels: {
-                                enabled: true
-                            }
-                        }
+                    subtitle: {
+                        text: 'Click the columns to view versions. Click again to view brands.'
                     },
                     yAxis: {
                         title: {
-                            text: 'Number Of cases / individuals'
-                        },
-                        showEmpty: false
+                            text: 'Number Of cases'
+                        }
+                    },
+                    plotOptions: {
+                        column: {
+                            cursor: 'pointer',
+                            point: {
+                                events: {
+                                    click: function () {
+                                        removeData_2();
+                                        var drilldown = this.drilldown;
+                                        if (drilldown) { // drill down
+                                            setChartIntenral(drilldown.name, drilldown.categories, drilldown.data, drilldown.color, -1);
+                                        } else { // restore
+                                            for (var key in seriesData) {
+                                                var serie = seriesData[key];
+                                                setChartIntenral(serie.name, serie.categories, serie.data, serie.color, -1);
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            dataLabels: {
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold'
+                                },
+                                formatter: function () {
+                                    return this.y;
+                                }
+                            }
+                        }
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            var point = this.point,
+                                    s = this.x + ':<b>' + this.y + ' cases showed</b><br/>';
+                            if (point.drilldown) {
+                                s += 'Click to view ' + ' reasons of visit for category ' + point.category;
+                            } else {
+                                s += 'Click to return to visit categories';
+                            }
+                            return s;
+                        }
                     },
                     series: [{
                             name: 'Cases'
@@ -98,7 +128,7 @@
                             name: 'Individuals'
                         }],
                     exporting: {
-                        enabled: true
+                        enabled: false
                     }
                 });
 
@@ -135,10 +165,7 @@
                     },
                     title: {
                         text: 'Attendance of Persons of concern'
-                    }, subtitle: {
-                        text: 'Data only for the last 30 days' // dummy text to reserve space for dynamic subtitle
-                    },
-                    legend: {
+                    }, legend: {
                         enabled: true,
                         layout: 'vertical',
                         align: 'right',
@@ -170,7 +197,9 @@
                             }, turboThreshold: 0
                         }]
                 });
-            });</script>
+            });
+
+        </script>
     </head>
     <body>
         <script src="highstock.js" type="text/javascript"></script>

@@ -157,21 +157,23 @@ public class TokenManagerService {
 
     public static TreeMap<String, List<VisitSummary>> getVisitTrendReport(Date startingDate, Date endDate) throws SQLException {
         TreeMap<String, List<VisitSummary>> visitSummaries = new TreeMap<>();
-        Connection connection = EntityManagerSingleton.getDefault().getConnection();
-        String getCaseData = GET_VISIT_TREND;
-        CallableStatement statement = connection.prepareCall(getCaseData);
-        statement.setDate(1, startingDate);
-        statement.setDate(2, endDate);
-        ResultSet rs = statement.executeQuery();
-        while (rs.next()) {
-            Integer count = rs.getInt("Cases");
-            Integer individuals = rs.getInt("Individuals");
-            String category = rs.getString("Category");
-            String reason = rs.getString("Reason");
-            if (visitSummaries.get(category) == null) {
-                visitSummaries.put(category, new ArrayList<>());
+        if (startingDate != null && endDate != null) {
+            Connection connection = EntityManagerSingleton.getDefault().getConnection();
+            String getCaseData = GET_VISIT_TREND;
+            CallableStatement statement = connection.prepareCall(getCaseData);
+            statement.setDate(1, startingDate);
+            statement.setDate(2, endDate);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Integer count = rs.getInt("Cases");
+                Integer individuals = rs.getInt("Individuals");
+                String category = rs.getString("Category");
+                String reason = rs.getString("Reason");
+                if (visitSummaries.get(category) == null) {
+                    visitSummaries.put(category, new ArrayList<>());
+                }
+                visitSummaries.get(category).add(new VisitSummary(category, reason, count, individuals));
             }
-            visitSummaries.get(category).add(new VisitSummary(category, reason, count, individuals));
         }
         return visitSummaries;
     }
